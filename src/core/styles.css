@@ -740,3 +740,37 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
 }
+
+
+/* ── Xeneon Bar Sizes (720px height target) ── */
+.widget-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  gap: 6px !important;
+}
+
+.clock-time { font-size: 56px !important; font-weight: 700 !important; line-height: 1 !important; letter-spacing: -0.03em !important; }
+.clock-date { font-size: 16px !important; opacity: 0.55 !important; letter-spacing: 0.04em !important; }
+
+.weather-main { display: flex !important; align-items: center !important; gap: 12px !important; }
+.weather-icon { font-size: 44px !important; }
+.weather-temp { font-size: 52px !important; font-weight: 700 !important; line-height: 1 !important; }
+.weather-desc { font-size: 15px !important; opacity: 0.6 !important; text-align: center !important; }
+.weather-hilo { font-size: 13px !important; opacity: 0.5 !important; }
+
+.np-inner { display: flex !important; align-items: center !important; gap: 14px !important; width: 100% !important; }
+.np-art, .np-art-placeholder { width: 72px !important; height: 72px !important; border-radius: 10px !important; flex-shrink: 0 !important; background: rgba(255, 255, 255, 0.05) !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 28px !important; }
+.np-title { font-size: 18px !important; font-weight: 600 !important; line-height: 1.2 !important; }
+.np-artist { font-size: 14px !important; opacity: 0.6 !important; }
+.np-controls { display: flex !important; gap: 8px !important; margin-top: 8px !important; }
+.np-btn { font-size: 24px !important; background: none !important; border: none !important; color: inherit !important; cursor: pointer !important; opacity: 0.7 !important; padding: 0 4px !important; }
+.np-btn:hover { opacity: 1 !important; }
+
+.stocks-row { display: flex !important; gap: 20px !important; align-items: center !important; justify-content: center !important; width: 100% !important; }
+.stock-ticker { font-size: 13px !important; font-weight: 700 !important; letter-spacing: 0.1em !important; opacity: 0.55 !important; }
+.stock-price { font-size: 28px !important; font-weight: 600 !important; line-height: 1.1 !important; }
+.stock-change { font-size: 14px !important; font-weight: 500 !important; }

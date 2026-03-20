@@ -29,15 +29,17 @@ export default function NowPlaying() {
   }
 
   return (
-    <div className="now-playing">
-      <div className="artwork">{'\u{1F3B6}'}</div>
-      <div className="info">
-        <div className="track">{track.track}</div>
-        <div className="artist">{track.artist}</div>
-        <div className="controls">
-          <button onClick={() => cmd('previous')}>{'\u{23EE}'}</button>
-          <button onClick={() => cmd('playpause')}>{track.playing ? '\u{23F8}' : '\u{25B6}'}</button>
-          <button onClick={() => cmd('next')}>{'\u{23ED}'}</button>
+    <div className="widget-content">
+      <div className="np-inner">
+        <div className="np-art-placeholder">{'\u{1F3B6}'}</div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div className="np-title">{track.track}</div>
+          <div className="np-artist">{track.artist}</div>
+          <div className="np-controls">
+            <button className="np-btn" onClick={() => cmd('previous')}>{'\u{23EE}'}</button>
+            <button className="np-btn" onClick={() => cmd('playpause')}>{track.playing ? '\u{23F8}' : '\u{25B6}'}</button>
+            <button className="np-btn" onClick={() => cmd('next')}>{'\u{23ED}'}</button>
+          </div>
         </div>
       </div>
     </div>

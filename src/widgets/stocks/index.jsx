@@ -19,16 +19,18 @@ export default function Stocks({ config }) {
   }, [tickers.join(','), interval])
 
   return (
-    <div className="stock-list">
-      {quotes.map((q) => (
-        <div key={q.ticker} className="stock-item">
-          <div className="stock-ticker">{q.ticker}</div>
-          <div className="stock-price">${q.price}</div>
-          <div className={`stock-change ${q.changePercent >= 0 ? 'positive' : 'negative'}`}>
-            {q.changePercent >= 0 ? '+' : ''}{q.changePercent}%
+    <div className="widget-content">
+      <div className="stocks-row">
+        {quotes.map((q) => (
+          <div key={q.ticker} className="stock-item">
+            <div className="stock-ticker">{q.ticker}</div>
+            <div className="stock-price">${q.price}</div>
+            <div className={`stock-change ${q.changePercent >= 0 ? 'positive' : 'negative'}`}>
+              {q.changePercent >= 0 ? '+' : ''}{q.changePercent}%
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
       {quotes.length === 0 && <span style={{ color: 'var(--muted)', fontSize: 12 }}>Loading...</span>}
     </div>
   )
