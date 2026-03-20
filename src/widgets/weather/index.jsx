@@ -21,17 +21,17 @@ export default function Weather({ config }) {
   }, [lat, lon, units])
 
   if (!data) {
-    return <div className="widget-content"><span style={{ color: 'var(--muted)' }}>Loading...</span></div>
+    return <div className="widget-content"><span style={{ color: '#6a6a6a' }}>Loading...</span></div>
   }
 
   return (
-    <div className="widget-content">
-      <div className="weather-main">
-        <span className="weather-icon">{data.icon}</span>
-        <span className="weather-temp">{data.temp}°{data.units}</span>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap:'6px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+        <span style={{fontSize:'48px'}}>{data.icon}</span>
+        <span style={{fontSize:'58px',fontWeight:700,lineHeight:1,color:'#e0e0e0'}}>{data.temp}°{data.units}</span>
       </div>
-      <div className="weather-desc">{data.condition}</div>
-      <div className="weather-hilo">H:{data.hi}° L:{data.lo}°</div>
+      <div style={{fontSize:'17px',color:'#8a8a8a'}}>{data.condition}</div>
+      <div style={{fontSize:'15px',color:'#6a6a6a'}}>H:{data.hi}° L:{data.lo}°</div>
     </div>
   )
 }

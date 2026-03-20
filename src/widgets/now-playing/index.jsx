@@ -57,9 +57,9 @@ function BrowseOverlay({ onClose }) {
         </div>
         <div className="np-browse-tracks">
           {loading ? (
-            <div style={{ color: 'var(--muted)', fontSize: 13, padding: 16 }}>Loading...</div>
+            <div style={{ color: '#6a6a6a', fontSize: 13, padding: 16 }}>Loading...</div>
           ) : tracks.length === 0 ? (
-            <div style={{ color: 'var(--muted)', fontSize: 13, padding: 16 }}>No tracks</div>
+            <div style={{ color: '#6a6a6a', fontSize: 13, padding: 16 }}>No tracks</div>
           ) : (
             tracks.map((t, i) => (
               <button key={i} className="np-browse-track" onClick={() => handlePlay(t)}>
@@ -97,7 +97,6 @@ export default function NowPlaying() {
     return () => { mounted = false; clearInterval(timer) }
   }, [])
 
-  // Interpolate position between polls for smooth progress
   useEffect(() => {
     if (!track?.playing) return
     const interval = setInterval(() => {
@@ -113,53 +112,30 @@ export default function NowPlaying() {
 
   if (!track || (!track.track && !track.playing)) {
     return (
-      <div className="widget-content" style={{ color: 'var(--muted)', fontSize: 13 }}>
+      <div className="widget-content" style={{ color: '#6a6a6a', fontSize: 13 }}>
         Not playing
       </div>
     )
   }
 
-  const progress = track.duration > 0 ? (localPos / track.duration) * 100 : 0
-
   return (
-    <div className="widget-content np-enhanced">
-      {/* Album Art */}
-      <div className="np-art-col" onClick={() => setBrowsing(true)}>
-        {track.artwork ? (
-          <img src={track.artwork} className="np-art-img" alt="" />
-        ) : (
-          <div className="np-art-fallback">{'\u{1F3B5}'}</div>
-        )}
+    <div style={{display:'flex',flexDirection:'row',alignItems:'center',height:'100%',width:'100%',gap:'16px',padding:'12px 16px',position:'relative'}}>
+      {/* Album art - left side */}
+      <div style={{width:'120px',height:'120px',borderRadius:'12px',background:'#1e1e1e',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'48px',overflow:'hidden'}}>
+        {track.artwork ? <img src={track.artwork} style={{width:'100%',height:'100%',objectFit:'cover'}} alt="" /> : '\u{1F3B5}'}
       </div>
-
-      {/* Track Info + Controls */}
-      <div className="np-info-col">
-        <div className="np-track-name">{track.track}</div>
-        <div className="np-track-artist">{track.artist}</div>
-        {track.album && <div className="np-track-album">{track.album}</div>}
-
-        {/* Progress bar */}
-        <div className="np-progress-row">
-          <span className="np-time">{formatTime(localPos)}</span>
-          <div className="np-progress-bar">
-            <div className="np-progress-fill" style={{ width: `${progress}%` }} />
-          </div>
-          <span className="np-time">{formatTime(track.duration)}</span>
+      {/* Track info - right side */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',gap:'6px',minWidth:0}}>
+        <div style={{fontSize:'20px',fontWeight:600,color:'#e0e0e0',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{track.track}</div>
+        <div style={{fontSize:'15px',color:'#6a6a6a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{track.artist}</div>
+        <div style={{display:'flex',gap:'16px',marginTop:'8px'}}>
+          <button onClick={() => cmd('previous')} style={{fontSize:'28px',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7}}>{'\u{23EE}'}</button>
+          <button onClick={() => cmd('playpause')} style={{fontSize:'32px',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.9}}>{track.playing ? '\u{23F8}' : '\u{25B6}'}</button>
+          <button onClick={() => cmd('next')} style={{fontSize:'28px',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7}}>{'\u{23ED}'}</button>
         </div>
-
-        {/* Controls */}
-        <div className="np-ctrl-row">
-          <button className="np-ctrl-btn" onClick={() => cmd('previous')}>{'\u{23EE}'}</button>
-          <button className="np-ctrl-btn np-ctrl-play" onClick={() => cmd('playpause')}>
-            {track.playing ? '\u{23F8}' : '\u{25B6}'}
-          </button>
-          <button className="np-ctrl-btn" onClick={() => cmd('next')}>{'\u{23ED}'}</button>
-        </div>
-
-        {/* Browse button */}
-        <button className="np-browse-btn" onClick={() => setBrowsing(true)}>Browse</button>
       </div>
-
+      {/* Browse button top right */}
+      <button onClick={() => setBrowsing(true)} style={{position:'absolute',top:'8px',right:'10px',padding:'3px 10px',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'12px',color:'#6a6a6a',fontSize:'11px',cursor:'pointer'}}>Browse</button>
       {/* Browse overlay */}
       {browsing && <BrowseOverlay onClose={() => setBrowsing(false)} />}
     </div>

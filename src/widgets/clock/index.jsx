@@ -21,9 +21,9 @@ export default function Clock({ config }) {
   const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 
   return (
-    <div className="widget-content">
-      <div className="clock-time">{timeStr}</div>
-      <div className="clock-date">{dateStr}</div>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap:'8px'}}>
+      <div style={{fontSize:'64px',fontWeight:700,lineHeight:1,letterSpacing:'-0.02em',color:'#e0e0e0'}}>{timeStr}</div>
+      <div style={{fontSize:'18px',color:'#6a6a6a',letterSpacing:'0.04em'}}>{dateStr}</div>
     </div>
   )
 }

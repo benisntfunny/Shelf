@@ -19,19 +19,15 @@ export default function Stocks({ config }) {
   }, [tickers.join(','), interval])
 
   return (
-    <div className="widget-content">
-      <div className="stocks-row">
-        {quotes.map((q) => (
-          <div key={q.ticker} className="stock-item">
-            <div className="stock-ticker">{q.ticker}</div>
-            <div className="stock-price">${q.price}</div>
-            <div className={`stock-change ${q.changePercent >= 0 ? 'positive' : 'negative'}`}>
-              {q.changePercent >= 0 ? '+' : ''}{q.changePercent}%
-            </div>
-          </div>
-        ))}
-      </div>
-      {quotes.length === 0 && <span style={{ color: 'var(--muted)', fontSize: 12 }}>Loading...</span>}
+    <div style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-around',height:'100%',width:'100%',padding:'12px'}}>
+      {quotes.map((q) => (
+        <div key={q.ticker} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'4px'}}>
+          <div style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.08em',color:'#6a6a6a'}}>{q.ticker}</div>
+          <div style={{fontSize:'36px',fontWeight:600,color:'#e0e0e0',lineHeight:1}}>${q.price?.toFixed(2)}</div>
+          <div style={{fontSize:'15px',fontWeight:500,color:q.changePercent>=0?'#4caf82':'#cf6679'}}>{q.changePercent>=0?'+':''}{q.changePercent?.toFixed(2)}%</div>
+        </div>
+      ))}
+      {quotes.length === 0 && <span style={{ color: '#6a6a6a', fontSize: 14 }}>Loading...</span>}
     </div>
   )
 }
