@@ -21,7 +21,11 @@ export default function SettingsApp() {
   const { secrets, loaded: secretsLoaded, updateSecret } = useSecrets()
   const [activeTab, setActiveTab] = useState('layout')
 
-  if (!loaded || !secretsLoaded) return null
+  if (!loaded || !secretsLoaded) return (
+    <div style={{ color: '#999', padding: 40, fontFamily: 'system-ui', textAlign: 'center' }}>
+      <p>Loading Shelf settings...</p>
+    </div>
+  )
 
   const selectedWidget = layout.widgets.find((w) => w.id === selectedWidgetId)
 

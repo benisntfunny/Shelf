@@ -6,8 +6,13 @@ export function useSecrets() {
 
   useEffect(() => {
     if (window.shelf) {
-      window.shelf.getSecrets().then((s) => {
+      const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+      Promise.race([window.shelf.getSecrets(), timeout]).then((s) => {
         setSecrets(s || {})
+        setLoaded(true)
+      }).catch(() => {
+        console.error('useSecrets: getSecrets failed, using defaults')
+        setSecrets({})
         setLoaded(true)
       })
     } else {

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, Tray, screen, nativeImage, Notification } = require('electron')
+const { app, BrowserWindow, Menu, Tray, screen, nativeImage, Notification, globalShortcut } = require('electron')
 const path = require('path')
 const { execSync } = require('child_process')
 const { registerIpcHandlers } = require('./ipc-handlers')
@@ -11,14 +11,22 @@ let tray = null
 
 function findTargetDisplay() {
   const displays = screen.getAllDisplays()
+  console.log('[Shelf] All displays:')
+  displays.forEach((d, i) => {
+    console.log(`  [${i}] id=${d.id} size=${d.size.width}x${d.size.height} bounds=(${d.bounds.x},${d.bounds.y},${d.bounds.width},${d.bounds.height}) scaleFactor=${d.scaleFactor}`)
+  })
   // Look for Xeneon Edge: 2560x720 physical (1280x360 logical at 2x)
   const xeneon = displays.find((d) => {
     const { width, height } = d.size
     return (width === 1280 && height === 360) || (width === 2560 && height === 720)
   })
-  if (xeneon) return xeneon
+  if (xeneon) {
+    console.log(`[Shelf] Found Xeneon: id=${xeneon.id} bounds=(${xeneon.bounds.x},${xeneon.bounds.y},${xeneon.bounds.width},${xeneon.bounds.height})`)
+    return xeneon
+  }
   // Fallback: smallest height display
   const sorted = [...displays].sort((a, b) => a.size.height - b.size.height)
+  console.log(`[Shelf] No Xeneon found, falling back to smallest display: id=${sorted[0].id} size=${sorted[0].size.width}x${sorted[0].size.height}`)
   return sorted[0]
 }
 
@@ -38,7 +46,7 @@ function createBarWindow(attempt = 0) {
   try {
     const target = findTargetDisplay()
 
-    if (!target || target.size.height > 400) {
+    if (!target || target.size.height > 720) {
       new Notification({
         title: 'Shelf',
         body: 'No Xeneon Edge display detected. Connect the display and restart Shelf.',
@@ -47,6 +55,7 @@ function createBarWindow(attempt = 0) {
     }
 
     const { x, y, width, height } = target.bounds
+    console.log(`[Shelf] Creating bar window at x=${x} y=${y} w=${width} h=${height}`)
 
     barWindow = new BrowserWindow({
       x,
@@ -130,7 +139,15 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  const icon = nativeImage.createEmpty()
+  // Create a small 16x16 icon so macOS renders the tray item
+  const icon = nativeImage.createFromBuffer(
+    Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVQ4T2P8z8BQz0BAwMDAwMDIQCRgYGBgZCASMIwaMGrAqAFEhgKxYTC0MxIABfYQEZjjwiQAAAAASUVORK5CYII=',
+      'base64'
+    ),
+    { width: 16, height: 16 }
+  )
+  icon.setTemplateImage(true)
   tray = new Tray(icon)
   tray.setTitle('S')
   tray.setToolTip('Shelf')
@@ -163,7 +180,7 @@ function notifyBarOfLayoutChange() {
 function handleDisplayChange() {
   setTimeout(() => {
     const target = findTargetDisplay()
-    if (!target || target.size.height > 400) return
+    if (!target || target.size.height > 720) return
 
     if (!barWindow || barWindow.isDestroyed()) {
       createBarWindow()
@@ -183,6 +200,10 @@ app.whenReady().then(() => {
   screen.on('display-metrics-changed', handleDisplayChange)
   screen.on('display-removed', handleDisplayChange)
   screen.on('display-added', handleDisplayChange)
+
+  globalShortcut.register('CommandOrControl+Shift+S', () => {
+    createSettingsWindow()
+  })
 })
 
 app.on('activate', () => {

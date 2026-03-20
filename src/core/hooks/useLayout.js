@@ -25,8 +25,13 @@ export function useLayout() {
 
   const loadFromMain = useCallback(() => {
     if (window.shelf) {
-      return window.shelf.getLayout().then((config) => {
+      const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+      return Promise.race([window.shelf.getLayout(), timeout]).then((config) => {
         setLayout(migrateLayout(config) || DEFAULT_LAYOUT)
+        setLoaded(true)
+      }).catch(() => {
+        console.error('useLayout: getLayout failed, using defaults')
+        setLayout(DEFAULT_LAYOUT)
         setLoaded(true)
       })
     } else {
