@@ -14,6 +14,8 @@ import felixStatusMeta from './felix-status/meta'
 import felixStatusConfig from './felix-status/config'
 import calendarMeta from './calendar/meta'
 import calendarConfig from './calendar/config'
+import displayMeta from './display/meta'
+import displayConfig from './display/config'
 
 import Clock from './clock/index'
 import Spacer from './spacer/index'
@@ -23,6 +25,7 @@ import Stocks from './stocks/index'
 import NowPlaying from './now-playing/index'
 import FelixStatus from './felix-status/index'
 import Calendar from './calendar/index'
+import Display from './display/index'
 
 const widgets = [
   { meta: clockMeta, config: clockConfig, component: Clock },
@@ -33,6 +36,7 @@ const widgets = [
   { meta: nowPlayingMeta, config: nowPlayingConfig, component: NowPlaying },
   { meta: felixStatusMeta, config: felixStatusConfig, component: FelixStatus },
   { meta: calendarMeta, config: calendarConfig, component: Calendar },
+  { meta: displayMeta, config: displayConfig, component: Display },
 ]
 
 export function getAllWidgets() {

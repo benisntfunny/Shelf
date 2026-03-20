@@ -8,6 +8,8 @@ contextBridge.exposeInMainWorld('shelf', {
   musicCommand: (cmd) => ipcRenderer.invoke('music-command', cmd),
   getStocks: (tickers) => ipcRenderer.invoke('get-stocks', tickers),
   getWeather: (opts) => ipcRenderer.invoke('get-weather', opts),
+  displaySet: (opts) => ipcRenderer.invoke('display-set', opts),
+  displayGet: () => ipcRenderer.invoke('display-get'),
   fetchUrl: (url) => ipcRenderer.invoke('fetch-url', url),
   getCalendarEvents: () => ipcRenderer.invoke('get-calendar-events'),
   getSecrets: () => ipcRenderer.invoke('get-secrets'),

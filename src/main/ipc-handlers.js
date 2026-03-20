@@ -1,4 +1,5 @@
 const { ipcMain } = require('electron')
+const { execSync } = require('child_process')
 const { loadConfig, saveConfig, loadSecrets, saveSecrets } = require('./config-store')
 const { getSystemStats } = require('./system-stats')
 const { getNowPlaying, musicCommand } = require('./apple-music')
@@ -48,6 +49,31 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
   ipcMain.handle('save-secrets', (_event, secrets) => {
     saveSecrets(secrets)
     return { ok: true }
+  })
+
+  ipcMain.handle('display-set', (_event, { property, value }) => {
+    const allowed = ['luminance', 'contrast', 'red', 'green', 'blue']
+    if (!allowed.includes(property)) return { error: 'invalid property' }
+    try {
+      execSync(`/opt/homebrew/bin/m1ddc display 3 set ${property} ${value}`)
+      return { ok: true }
+    } catch (e) {
+      return { error: e.message }
+    }
+  })
+
+  ipcMain.handle('display-get', () => {
+    const props = ['luminance', 'contrast', 'red', 'green', 'blue']
+    const result = {}
+    for (const prop of props) {
+      try {
+        const out = execSync(`/opt/homebrew/bin/m1ddc display 3 get ${prop}`, { encoding: 'utf8' })
+        result[prop] = parseInt(out.trim(), 10)
+      } catch {
+        result[prop] = 0
+      }
+    }
+    return result
   })
 
   ipcMain.handle('fetch-url', async (_event, url) => {
