@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/calendar",
+  "version": "1.0.0",
+  "description": "Today's calendar events",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

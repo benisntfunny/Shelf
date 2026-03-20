@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/weather",
+  "version": "1.0.0",
+  "description": "Current weather conditions",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

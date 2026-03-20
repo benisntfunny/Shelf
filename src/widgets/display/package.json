@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/display",
+  "version": "1.0.0",
+  "description": "Control Xeneon Edge brightness and color temperature",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

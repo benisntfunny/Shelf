@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/spacer",
+  "version": "1.0.0",
+  "description": "Empty flexible space",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

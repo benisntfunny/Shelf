@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/stocks",
+  "version": "1.0.0",
+  "description": "Stock ticker prices",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

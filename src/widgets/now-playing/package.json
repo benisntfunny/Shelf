@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/now-playing",
+  "version": "1.0.0",
+  "description": "Apple Music current track",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

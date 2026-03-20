@@ -1,0 +1,104 @@
+{
+  "version": "1",
+  "widgets": [
+    {
+      "id": "clock",
+      "name": "Clock",
+      "description": "Shows current time and date",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/clock",
+      "builtin": true,
+      "sizes": ["xs", "sm"],
+      "tags": ["time", "utility"]
+    },
+    {
+      "id": "spacer",
+      "name": "Spacer",
+      "description": "Empty flexible space for layout control",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/spacer",
+      "builtin": true,
+      "sizes": ["xs", "sm", "md", "lg", "xl"],
+      "tags": ["layout", "utility"]
+    },
+    {
+      "id": "system",
+      "name": "System",
+      "description": "CPU, RAM, and network usage stats",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/system",
+      "builtin": true,
+      "sizes": ["sm", "md"],
+      "tags": ["monitoring", "system"]
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "description": "Current weather conditions and forecast",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/weather",
+      "builtin": true,
+      "sizes": ["sm", "md"],
+      "tags": ["weather", "utility"]
+    },
+    {
+      "id": "stocks",
+      "name": "Stocks",
+      "description": "Live stock ticker prices and changes",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/stocks",
+      "builtin": true,
+      "sizes": ["md", "lg", "xl"],
+      "tags": ["finance", "stocks"]
+    },
+    {
+      "id": "now-playing",
+      "name": "Now Playing",
+      "description": "Apple Music current track with controls",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/now-playing",
+      "builtin": true,
+      "sizes": ["md", "lg", "xl"],
+      "tags": ["music", "media"]
+    },
+    {
+      "id": "felix-status",
+      "name": "Felix Status",
+      "description": "URL health monitor with status indicator",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/felix-status",
+      "builtin": true,
+      "sizes": ["xs", "sm"],
+      "tags": ["monitoring", "status"]
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "description": "Today's calendar events at a glance",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/calendar",
+      "builtin": true,
+      "sizes": ["sm", "md", "lg"],
+      "tags": ["calendar", "productivity"]
+    },
+    {
+      "id": "display",
+      "name": "Display",
+      "description": "Control Xeneon Edge brightness and color temperature",
+      "author": "Shelf",
+      "version": "1.0.0",
+      "npm": "@shelf-widgets/display",
+      "builtin": true,
+      "sizes": ["sm", "md", "lg"],
+      "tags": ["display", "hardware"]
+    }
+  ]
+}

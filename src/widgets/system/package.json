@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/system",
+  "version": "1.0.0",
+  "description": "CPU, RAM, and network stats",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}

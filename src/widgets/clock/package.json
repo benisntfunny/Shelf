@@ -1,0 +1,7 @@
+{
+  "name": "@shelf-widgets/clock",
+  "version": "1.0.0",
+  "description": "Time and date display",
+  "main": "index.jsx",
+  "peerDependencies": { "react": ">=18" }
+}
