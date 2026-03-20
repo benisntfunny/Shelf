@@ -8,6 +8,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/clock",
+      "github": "https://github.com/benisntfunny/shelf-widget-clock",
       "builtin": true,
       "sizes": ["xs", "sm"],
       "tags": ["time", "utility"]
@@ -19,6 +20,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/spacer",
+      "github": "https://github.com/benisntfunny/shelf-widget-spacer",
       "builtin": true,
       "sizes": ["xs", "sm", "md", "lg", "xl"],
       "tags": ["layout", "utility"]
@@ -30,6 +32,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/system",
+      "github": "https://github.com/benisntfunny/shelf-widget-system",
       "builtin": true,
       "sizes": ["sm", "md"],
       "tags": ["monitoring", "system"]
@@ -41,6 +44,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/weather",
+      "github": "https://github.com/benisntfunny/shelf-widget-weather",
       "builtin": true,
       "sizes": ["sm", "md"],
       "tags": ["weather", "utility"]
@@ -52,6 +56,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/stocks",
+      "github": "https://github.com/benisntfunny/shelf-widget-stocks",
       "builtin": true,
       "sizes": ["md", "lg", "xl"],
       "tags": ["finance", "stocks"]
@@ -63,6 +68,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/now-playing",
+      "github": "https://github.com/benisntfunny/shelf-widget-now-playing",
       "builtin": true,
       "sizes": ["md", "lg", "xl"],
       "tags": ["music", "media"]
@@ -74,6 +80,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/felix-status",
+      "github": "https://github.com/benisntfunny/shelf-widget-felix-status",
       "builtin": true,
       "sizes": ["xs", "sm"],
       "tags": ["monitoring", "status"]
@@ -96,6 +103,7 @@
       "author": "Shelf",
       "version": "1.0.0",
       "npm": "@shelf-widgets/display",
+      "github": "https://github.com/benisntfunny/shelf-widget-display",
       "builtin": true,
       "sizes": ["sm", "md", "lg"],
       "tags": ["display", "hardware"]
