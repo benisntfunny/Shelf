@@ -22,4 +22,6 @@ async function boot() {
   )
 }
 
-boot()
+boot().catch(err => {
+  document.body.innerHTML = '<div style="color:red;padding:20px;font-family:monospace">' + err.message + '<br>' + err.stack + '</div>'
+})

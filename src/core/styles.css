@@ -774,3 +774,280 @@ body {
 .stock-ticker { font-size: 13px !important; font-weight: 700 !important; letter-spacing: 0.1em !important; opacity: 0.55 !important; }
 .stock-price { font-size: 28px !important; font-weight: 600 !important; line-height: 1.1 !important; }
 .stock-change { font-size: 14px !important; font-weight: 500 !important; }
+
+/* ── Enhanced Now Playing ── */
+.np-enhanced {
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  overflow: hidden !important;
+}
+
+.np-art-col {
+  width: 240px;
+  min-width: 240px;
+  height: 100%;
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.np-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.np-art-fallback {
+  font-size: 64px;
+  opacity: 0.3;
+}
+
+.np-info-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px 20px;
+  gap: 2px;
+  position: relative;
+}
+
+.np-track-name {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.np-track-artist {
+  font-size: 15px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.np-track-album {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+/* Progress bar */
+.np-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.np-time {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 32px;
+  font-variant-numeric: tabular-nums;
+}
+
+.np-time:last-child {
+  text-align: right;
+}
+
+.np-progress-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.np-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s linear;
+}
+
+/* Controls */
+.np-ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.np-ctrl-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.np-ctrl-btn:hover { opacity: 1; }
+
+.np-ctrl-play {
+  font-size: 32px;
+  opacity: 0.9;
+}
+
+/* Browse button */
+.np-browse-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  padding: 3px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.np-browse-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+/* ── Browse Overlay ── */
+.np-browse-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.95);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  animation: np-slide-up 0.2s ease-out;
+}
+
+@keyframes np-slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.np-browse-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 21;
+  padding: 4px 6px;
+  transition: color 0.15s;
+}
+
+.np-browse-close:hover { color: var(--text); }
+
+.np-browse-panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.np-browse-playlists {
+  width: 30%;
+  overflow-y: auto;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.np-browse-pill {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.np-browse-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+.np-browse-pill.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.np-browse-tracks {
+  width: 70%;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.np-browse-track {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.np-browse-track:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.np-browse-track-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-browse-track-artist {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

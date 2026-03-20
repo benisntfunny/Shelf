@@ -4,7 +4,7 @@
   "private": true,
   "main": "src/main/main.js",
   "scripts": {
-    "dev": "concurrently \"vite\" \"sleep 2 && electron .\"",
+    "dev": "concurrently \"vite\" \"sleep 2 && SHELF_DEV=1 electron .\"",
     "dev:vite": "vite",
     "dev:electron": "electron .",
     "build": "vite build",

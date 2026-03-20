@@ -79,7 +79,7 @@ function createBarWindow(attempt = 0) {
 
     barWindow.setSimpleFullScreen(true)
 
-    const isDev = !app.isPackaged
+    const isDev = !!process.env.SHELF_DEV
     if (isDev) {
       barWindow.loadURL('http://localhost:5173')
     } else {
@@ -124,7 +124,7 @@ function createSettingsWindow() {
     },
   })
 
-  const isDev = !app.isPackaged
+  const isDev = !!process.env.SHELF_DEV
   if (isDev) {
     settingsWindow.loadURL('http://localhost:5173?mode=settings')
   } else {
