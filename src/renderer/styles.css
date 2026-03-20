@@ -1,0 +1,663 @@
+:root {
+  --bg: #0f0f0f;
+  --card-bg: linear-gradient(180deg, #1d1d1d 0%, #141414 100%);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.07),
+    0 0 0 1.5px rgba(0, 0, 0, 0.8), 0 4px 14px rgba(0, 0, 0, 0.5);
+  --text: #e0e0e0;
+  --muted: #6a6a6a;
+  --accent: #c9a84c;
+  --positive: #4caf82;
+  --negative: #cf6679;
+  --radius: 14px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+  -webkit-app-region: no-drag;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.app {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Widget Bar - 12 column grid */
+.widget-bar {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: stretch;
+  height: 100%;
+  padding: 8px 12px;
+  gap: 8px;
+  overflow: hidden;
+}
+
+/* Widget Card */
+.widget-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+/* Grid column spans for widget sizes */
+.widget-card.size-xs { grid-column: span 1; }
+.widget-card.size-sm { grid-column: span 2; }
+.widget-card.size-md { grid-column: span 3; }
+.widget-card.size-lg { grid-column: span 4; }
+.widget-card.size-xl { grid-column: span 6; }
+.widget-card.size-full { grid-column: span 12; }
+
+.widget-card.edit-mode {
+  border-color: var(--accent);
+  cursor: grab;
+}
+
+.widget-card.edit-mode:active {
+  cursor: grabbing;
+}
+
+.widget-card.dragging {
+  opacity: 0.5;
+}
+
+.widget-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent), var(--card-shadow);
+}
+
+/* Drag Handle */
+.drag-handle {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 4px;
+  background: var(--muted);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.edit-mode .drag-handle {
+  opacity: 1;
+}
+
+/* Remove button on widget cards in edit mode */
+.widget-remove {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--negative);
+  color: white;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.edit-mode .widget-remove {
+  opacity: 1;
+}
+
+/* Edit Panel */
+.edit-panel {
+  position: relative;
+  background: linear-gradient(180deg, #1a1a1a 0%, #111111 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  min-height: 220px;
+}
+
+.edit-panel.open {
+  display: flex;
+}
+
+/* Widget Palette */
+.widget-palette {
+  width: 280px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.widget-palette h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.palette-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.palette-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+}
+
+.palette-card .icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.palette-card .name {
+  font-size: 11px;
+  color: var(--text);
+}
+
+/* Config Panel */
+.config-panel {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.config-panel h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.config-panel .no-selection {
+  color: var(--muted);
+  font-size: 13px;
+  padding-top: 40px;
+  text-align: center;
+}
+
+.config-field {
+  margin-bottom: 14px;
+}
+
+.config-field label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.config-field input[type='text'],
+.config-field input[type='number'],
+.config-field input[type='password'] {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+.config-field input:focus {
+  border-color: var(--accent);
+}
+
+.config-field select {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+/* Toggle */
+.toggle-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle.on {
+  background: var(--accent);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+}
+
+.toggle.on::after {
+  transform: translateX(16px);
+}
+
+/* List field (for tickers, etc) */
+.list-field .list-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.list-field .list-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.list-field .list-item button {
+  background: none;
+  border: none;
+  color: var(--negative);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+}
+
+.list-field .add-row {
+  display: flex;
+  gap: 4px;
+}
+
+.list-field .add-row input {
+  flex: 1;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+}
+
+.list-field .add-row button {
+  padding: 4px 10px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Size selector in config */
+.size-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.size-selector button {
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.size-selector button.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+/* Done button */
+.done-button {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  padding: 6px 20px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.done-button:hover {
+  filter: brightness(1.1);
+}
+
+/* Widget-specific styles */
+.widget-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock-time {
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.clock-date {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.weather-temp {
+  font-size: 28px;
+  font-weight: 300;
+}
+
+.weather-icon {
+  font-size: 24px;
+}
+
+.weather-range {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.weather-condition {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.now-playing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+}
+
+.now-playing .artwork {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.now-playing .info {
+  flex: 1;
+  min-width: 0;
+}
+
+.now-playing .track {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now-playing .artist {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now-playing .controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.now-playing .controls button {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.now-playing .controls button:hover {
+  opacity: 1;
+}
+
+.stock-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  width: 100%;
+  padding: 4px;
+}
+
+.stock-item {
+  text-align: center;
+  min-width: 60px;
+}
+
+.stock-ticker {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.stock-price {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.stock-change {
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.stock-change.positive {
+  color: var(--positive);
+}
+
+.stock-change.negative {
+  color: var(--negative);
+}
+
+.system-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--muted);
+  width: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.stat-value {
+  font-size: 11px;
+  width: 32px;
+  text-align: right;
+}
+
+.felix-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.status-dot.up {
+  background: var(--positive);
+  box-shadow: 0 0 8px var(--positive);
+}
+
+.status-dot.down {
+  background: var(--negative);
+  box-shadow: 0 0 8px var(--negative);
+}
+
+.status-dot.unknown {
+  background: var(--muted);
+}
+
+.felix-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.felix-time {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Calendar widget */
+.calendar-events {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.calendar-event {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.calendar-time {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.calendar-title {
+  font-size: 11px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
