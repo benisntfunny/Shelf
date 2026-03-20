@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('shelf', {
   getPlaylists: () => ipcRenderer.invoke('get-playlists'),
   getPlaylistTracks: (name) => ipcRenderer.invoke('get-playlist-tracks', name),
   playTrack: ({ name, artist }) => ipcRenderer.invoke('play-track', { name, artist }),
+  getAlbumArt: ({ album, artist }) => ipcRenderer.invoke('get-album-art', { album, artist }),
+  searchTracks: (query) => ipcRenderer.invoke('search-tracks', query),
   getStocks: (tickers) => ipcRenderer.invoke('get-stocks', tickers),
   getWeather: (opts) => ipcRenderer.invoke('get-weather', opts),
   displaySet: (opts) => ipcRenderer.invoke('display-set', opts),

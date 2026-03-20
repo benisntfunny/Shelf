@@ -21,9 +21,11 @@ export default function Clock({ config }) {
   const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 
   return (
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap:'8px'}}>
-      <div style={{fontSize:'64px',fontWeight:700,lineHeight:1,letterSpacing:'-0.02em',color:'#e0e0e0'}}>{timeStr}</div>
-      <div style={{fontSize:'18px',color:'#6a6a6a',letterSpacing:'0.04em'}}>{dateStr}</div>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap:'1vh'}}>
+      <div style={{fontSize:'18vh',fontWeight:700,lineHeight:1,letterSpacing:'-0.03em',color:'#e0e0e0'}}>{hours}:{minutes}</div>
+      {showSeconds && <div style={{fontSize:'6vh',fontWeight:400,color:'#8a8a8a',lineHeight:1}}>{seconds}</div>}
+      {!use24h && <div style={{fontSize:'5vh',fontWeight:500,color:'#6a6a6a',lineHeight:1}}>{now.getHours() >= 12 ? 'PM' : 'AM'}</div>}
+      <div style={{fontSize:'4.5vh',color:'#6a6a6a',letterSpacing:'0.04em'}}>{dateStr}</div>
     </div>
   )
 }

@@ -25,13 +25,11 @@ export default function Weather({ config }) {
   }
 
   return (
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap:'6px'}}>
-      <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-        <span style={{fontSize:'48px'}}>{data.icon}</span>
-        <span style={{fontSize:'58px',fontWeight:700,lineHeight:1,color:'#e0e0e0'}}>{data.temp}°{data.units}</span>
-      </div>
-      <div style={{fontSize:'17px',color:'#8a8a8a'}}>{data.condition}</div>
-      <div style={{fontSize:'15px',color:'#6a6a6a'}}>H:{data.hi}° L:{data.lo}°</div>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap:'1.5vh'}}>
+      <div style={{fontSize:'14vh',lineHeight:1}}>{data.icon}</div>
+      <div style={{fontSize:'16vh',fontWeight:700,lineHeight:1,color:'#e0e0e0'}}>{data.temp}°</div>
+      <div style={{fontSize:'4.5vh',color:'#8a8a8a'}}>{data.condition}</div>
+      <div style={{fontSize:'4vh',color:'#6a6a6a'}}>H:{data.hi}° L:{data.lo}°</div>
     </div>
   )
 }

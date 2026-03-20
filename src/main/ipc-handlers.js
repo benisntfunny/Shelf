@@ -2,7 +2,7 @@ const { ipcMain } = require('electron')
 const { execSync } = require('child_process')
 const { loadConfig, saveConfig, loadSecrets, saveSecrets } = require('./config-store')
 const { getSystemStats } = require('./system-stats')
-const { getNowPlaying, musicCommand, getPlaylists, getPlaylistTracks, playTrack } = require('./apple-music')
+const { getNowPlaying, musicCommand, getPlaylists, getPlaylistTracks, playTrack, getAlbumArtByName, searchTracks } = require('./apple-music')
 const { getStockQuotes } = require('./stocks-api')
 const { getWeather } = require('./weather-api')
 const { getCalendarEvents } = require('./calendar')
@@ -40,6 +40,14 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
 
   ipcMain.handle('play-track', (_event, { name, artist }) => {
     return playTrack(name, artist)
+  })
+
+  ipcMain.handle('get-album-art', (_event, { album, artist }) => {
+    return getAlbumArtByName(album, artist)
+  })
+
+  ipcMain.handle('search-tracks', (_event, query) => {
+    return searchTracks(query)
   })
 
   ipcMain.handle('get-stocks', (_event, tickers) => {

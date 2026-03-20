@@ -1,13 +1,18 @@
 const { app, BrowserWindow, Menu, Tray, screen, nativeImage, Notification, globalShortcut } = require('electron')
 const path = require('path')
-const { execSync } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const { registerIpcHandlers } = require('./ipc-handlers')
+
+// Enable touch support
+app.commandLine.appendSwitch('touch-events', 'enabled')
+app.commandLine.appendSwitch('enable-features', 'TouchpadAndWheelScrollLatching,AsyncWheelEvents')
 
 Menu.setApplicationMenu(null)
 
 let barWindow = null
 let settingsWindow = null
 let tray = null
+let touchRemapProcess = null
 
 function findTargetDisplay() {
   const displays = screen.getAllDisplays()
@@ -139,14 +144,8 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  // Create a small 16x16 icon so macOS renders the tray item
-  const icon = nativeImage.createFromBuffer(
-    Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVQ4T2P8z8BQz0BAwMDAwMDIQCRgYGBgZCASMIwaMGrAqAFEhgKxYTC0MxIABfYQEZjjwiQAAAAASUVORK5CYII=',
-      'base64'
-    ),
-    { width: 16, height: 16 }
-  )
+  const iconPath = path.join(__dirname, '../../assets/icon.png')
+  const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 })
   icon.setTemplateImage(true)
   tray = new Tray(icon)
   tray.setTitle('S')
@@ -192,10 +191,55 @@ function handleDisplayChange() {
   }, 2000)
 }
 
+function startTouchRemap() {
+  if (touchRemapProcess) {
+    touchRemapProcess.kill()
+    touchRemapProcess = null
+  }
+
+  // In dev: native/touch-remap relative to project root
+  // In packaged app: Resources/native/touch-remap
+  const binaryPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'native', 'touch-remap')
+    : path.join(__dirname, '../../native/touch-remap')
+  const fs = require('fs')
+  if (!fs.existsSync(binaryPath)) {
+    console.log('[Shelf] Touch remapper binary not found at', binaryPath)
+    return
+  }
+
+  const target = findTargetDisplay()
+  if (!target) return
+
+  const { x, y, width, height } = target.bounds
+  console.log(`[Shelf] Starting touch remapper for display at (${x}, ${y}) ${width}x${height}`)
+
+  touchRemapProcess = spawn(binaryPath, [String(x), String(y), String(width), String(height)], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+
+  touchRemapProcess.stdout.on('data', (data) => {
+    const msg = data.toString().trim()
+    if (msg === 'READY') {
+      console.log('[Shelf] Touch remapper is active')
+    }
+  })
+
+  touchRemapProcess.stderr.on('data', (data) => {
+    console.log('[Shelf] touch-remap:', data.toString().trim())
+  })
+
+  touchRemapProcess.on('exit', (code) => {
+    console.log(`[Shelf] Touch remapper exited with code ${code}`)
+    touchRemapProcess = null
+  })
+}
+
 app.whenReady().then(() => {
   registerIpcHandlers(notifyBarOfLayoutChange)
   createTray()
   createBarWindow()
+  startTouchRemap()
 
   screen.on('display-metrics-changed', handleDisplayChange)
   screen.on('display-removed', handleDisplayChange)
@@ -204,6 +248,13 @@ app.whenReady().then(() => {
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     createSettingsWindow()
   })
+})
+
+app.on('will-quit', () => {
+  if (touchRemapProcess) {
+    touchRemapProcess.kill()
+    touchRemapProcess = null
+  }
 })
 
 app.on('activate', () => {

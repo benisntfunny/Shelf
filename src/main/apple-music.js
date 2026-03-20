@@ -20,19 +20,23 @@ function runOsascript(script) {
 
 async function getAlbumArt() {
   try {
-    const script = `
-tell application "Music"
-  set artData to raw data of artwork 1 of current track
-  set artFile to POSIX file "${ARTWORK_PATH}"
-  set fRef to open for access artFile with write permission
-  set eof fRef to 0
-  write artData to fRef
-  close access fRef
-end tell
-`.replace(/\n/g, '\\n')
+    const script = [
+      'tell application "Music"',
+      '  set artData to raw data of artwork 1 of current track',
+      `  set artFile to POSIX file "${ARTWORK_PATH}"`,
+      '  set fRef to open for access artFile with write permission',
+      '  set eof fRef to 0',
+      '  write artData to fRef',
+      '  close access fRef',
+      'end tell',
+    ]
+
+    const args = []
+    for (const line of script) args.push('-e', line)
 
     await new Promise((resolve, reject) => {
-      exec(`osascript -e '${script}'`, { timeout: 5000 }, (err) => {
+      const { execFile } = require('child_process')
+      execFile('osascript', args, { timeout: 5000 }, (err) => {
         if (err) return reject(err)
         resolve()
       })
@@ -111,19 +115,28 @@ async function getPlaylists() {
 async function getPlaylistTracks(playlistName) {
   try {
     const escaped = playlistName.replace(/"/g, '\\"')
-    const script = `
-tell application "Music"
-  set pl to playlist "${escaped}"
-  set output to ""
-  repeat with t in tracks of pl
-    set output to output & name of t & "|||" & artist of t & "|||" & (duration of t as string) & "\\n"
-  end repeat
-  return output
-end tell
-`.replace(/\n/g, '\\n')
+    // Bulk fetch — gets all properties in 4 calls instead of N iterations
+    const script = [
+      'tell application "Music"',
+      `  set pl to playlist "${escaped}"`,
+      '  set tNames to name of every track of pl',
+      '  set tArtists to artist of every track of pl',
+      '  set tAlbums to album of every track of pl',
+      '  set tDurations to duration of every track of pl',
+      '  set output to ""',
+      '  repeat with i from 1 to count of tNames',
+      '    set output to output & item i of tNames & "|||" & item i of tArtists & "|||" & item i of tAlbums & "|||" & (item i of tDurations as string) & linefeed',
+      '  end repeat',
+      '  return output',
+      'end tell',
+    ]
+
+    const args = []
+    for (const line of script) args.push('-e', line)
 
     const result = await new Promise((resolve) => {
-      exec(`osascript -e '${script}'`, { timeout: 15000 }, (err, stdout) => {
+      const { execFile } = require('child_process')
+      execFile('osascript', args, { timeout: 15000 }, (err, stdout) => {
         if (err) {
           console.error('[apple-music] getPlaylistTracks failed:', err.message)
           return resolve(null)
@@ -137,8 +150,13 @@ end tell
       .split('\n')
       .filter(Boolean)
       .map((line) => {
-        const [name, artist, duration] = line.split('|||')
-        return { name: (name || '').trim(), artist: (artist || '').trim(), duration: parseFloat(duration) || 0 }
+        const [name, artist, album, duration] = line.split('|||')
+        return {
+          name: (name || '').trim(),
+          artist: (artist || '').trim(),
+          album: (album || '').trim(),
+          duration: parseFloat(duration) || 0,
+        }
       })
   } catch (e) {
     console.error('[apple-music] getPlaylistTracks failed:', e.message)
@@ -166,4 +184,112 @@ end tell`.replace(/\n/g, '\\n')
   }
 }
 
-module.exports = { getNowPlaying, musicCommand, getPlaylists, getPlaylistTracks, playTrack }
+const albumArtCache = new Map()
+
+async function getAlbumArtByName(albumName, artistName) {
+  const key = `${albumName}|||${artistName}`
+  if (albumArtCache.has(key)) return albumArtCache.get(key)
+
+  try {
+    const escapedAlbum = albumName.replace(/"/g, '\\"')
+    const escapedArtist = artistName.replace(/"/g, '\\"')
+    const artPath = `/tmp/shelf-album-art-${Date.now()}.jpg`
+    const script = [
+      'tell application "Music"',
+      `  set matches to (every track whose album is "${escapedAlbum}" and artist is "${escapedArtist}")`,
+      '  if matches is {} then',
+      `    set matches to (every track whose album is "${escapedAlbum}")`,
+      '  end if',
+      '  if matches is not {} then',
+      '    set t to item 1 of matches',
+      '    if (count of artworks of t) > 0 then',
+      '      set artData to raw data of artwork 1 of t',
+      `      set artFile to POSIX file "${artPath}"`,
+      '      set fRef to open for access artFile with write permission',
+      '      set eof fRef to 0',
+      '      write artData to fRef',
+      '      close access fRef',
+      '    end if',
+      '  end if',
+      'end tell',
+    ]
+
+    const args = []
+    for (const line of script) args.push('-e', line)
+
+    await new Promise((resolve) => {
+      const { execFile } = require('child_process')
+      execFile('osascript', args, { timeout: 5000 }, (err) => {
+        resolve()
+      })
+    })
+
+    let result = null
+    if (fs.existsSync(artPath)) {
+      const buf = fs.readFileSync(artPath)
+      if (buf.length > 0) {
+        result = `data:image/jpeg;base64,${buf.toString('base64')}`
+      }
+      fs.unlinkSync(artPath)
+    }
+    albumArtCache.set(key, result)
+    return result
+  } catch (e) {
+    console.error('[apple-music] getAlbumArtByName failed:', e.message)
+    albumArtCache.set(key, null)
+    return null
+  }
+}
+
+async function searchTracks(query) {
+  try {
+    const escaped = query.replace(/"/g, '\\"')
+    const script = [
+      'tell application "Music"',
+      `  set results to (search playlist "Library" for "${escaped}")`,
+      '  set output to ""',
+      '  set maxCount to 50',
+      '  set i to 0',
+      '  repeat with t in results',
+      '    set i to i + 1',
+      '    if i > maxCount then exit repeat',
+      '    set output to output & name of t & "|||" & artist of t & "|||" & album of t & "|||" & (duration of t as string) & linefeed',
+      '  end repeat',
+      '  return output',
+      'end tell',
+    ]
+
+    const args = []
+    for (const line of script) args.push('-e', line)
+
+    const result = await new Promise((resolve) => {
+      const { execFile } = require('child_process')
+      execFile('osascript', args, { timeout: 15000 }, (err, stdout) => {
+        if (err) {
+          console.error('[apple-music] searchTracks failed:', err.message)
+          return resolve(null)
+        }
+        resolve(stdout.trim())
+      })
+    })
+
+    if (!result) return []
+    return result
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => {
+        const [name, artist, album, duration] = line.split('|||')
+        return {
+          name: (name || '').trim(),
+          artist: (artist || '').trim(),
+          album: (album || '').trim(),
+          duration: parseFloat(duration) || 0,
+        }
+      })
+  } catch (e) {
+    console.error('[apple-music] searchTracks failed:', e.message)
+    return []
+  }
+}
+
+module.exports = { getNowPlaying, musicCommand, getPlaylists, getPlaylistTracks, playTrack, getAlbumArtByName, searchTracks }
