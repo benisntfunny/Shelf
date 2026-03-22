@@ -146,6 +146,35 @@ function recordHistory(stats) {
   if (history.netDown.length > MAX_HISTORY) history.netDown.shift()
 }
 
+function getCpuTemp() {
+  try {
+    // Try reading from ioreg SMC
+    const output = execSync(
+      'ioreg -rc AppleSmartBattery 2>/dev/null || echo ""',
+      { encoding: 'utf8', timeout: 3000 }
+    )
+    // Fallback: try osx-cpu-temp or powermetrics (best effort)
+    try {
+      const temp = execSync(
+        'sudo -n powermetrics --samplers smc -i1 -n1 2>/dev/null | grep "CPU die temperature" | awk \'{print $4}\'',
+        { encoding: 'utf8', timeout: 3000 }
+      ).trim()
+      if (temp) return { temp: parseFloat(temp), available: true }
+    } catch {}
+    // Try sysctl (some Macs)
+    try {
+      const temp = execSync(
+        'sysctl -n machdep.xcpm.cpu_thermal_level 2>/dev/null',
+        { encoding: 'utf8', timeout: 3000 }
+      ).trim()
+      if (temp) return { temp: parseInt(temp, 10), available: true }
+    } catch {}
+    return { temp: 0, available: false }
+  } catch {
+    return { temp: 0, available: false }
+  }
+}
+
 function getFullStats() {
   const cpuUsage = getCpuUsage()
   const perCore = getCpuPerCore()
@@ -153,6 +182,7 @@ function getFullStats() {
   const disk = getDiskStats()
   const network = getNetworkStats()
   const battery = getBatteryStats()
+  const cpuTemp = getCpuTemp()
 
   const stats = {
     cpu: { usage: cpuUsage, perCore },
@@ -160,6 +190,7 @@ function getFullStats() {
     disk,
     network,
     battery,
+    cpuTemp,
   }
 
   recordHistory(stats)
