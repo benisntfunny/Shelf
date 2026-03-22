@@ -14,7 +14,7 @@ function useContainerSize(ref) {
   return size
 }
 
-function SingleClock({ timezone, label, use24h, showSeconds, containerH, isCompact }) {
+function SingleClock({ timezone, label, use24h, showSeconds, containerW, containerH, isCompact }) {
   const [now, setNow] = useState(new Date())
 
   useEffect(() => {
@@ -54,8 +54,12 @@ function SingleClock({ timezone, label, use24h, showSeconds, containerH, isCompa
   if (showPeriod) lines++
   if (showDate) lines++
 
-  // Time gets ~50% of height, other elements share the rest
-  const timeFontSize = isCompact ? h * 0.35 : h * 0.5 / Math.max(1, lines * 0.3)
+  const w = containerW || h * 2
+  // Size based on height, but cap so time doesn't overflow width
+  // "12:88" is ~4 characters wide, so max font = width / 3.2
+  const heightBased = isCompact ? h * 0.35 : h * 0.5 / Math.max(1, lines * 0.3)
+  const widthBased = w / 3.2
+  const timeFontSize = Math.min(heightBased, widthBased)
   const smallFontSize = timeFontSize * 0.28
   const labelFontSize = timeFontSize * 0.22
 
@@ -82,7 +86,7 @@ export default function Clock({ config }) {
     return (
       <div ref={ref} style={{height:'100%',width:'100%'}}>
         {container.h > 0 && (
-          <SingleClock timezone={config?.timezone} label={config?.label} use24h={use24h} showSeconds={showSeconds} containerH={container.h} />
+          <SingleClock timezone={config?.timezone} label={config?.label} use24h={use24h} showSeconds={showSeconds} containerW={container.w} containerH={container.h} />
         )}
       </div>
     )
@@ -97,6 +101,7 @@ export default function Clock({ config }) {
           label={clock.label}
           use24h={use24h}
           showSeconds={showSeconds}
+          containerW={container.w / Math.max(1, clocks.length)}
           containerH={container.h}
           isCompact
         />
