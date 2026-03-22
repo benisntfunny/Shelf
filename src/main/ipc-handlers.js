@@ -22,6 +22,11 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
     return getSystemStats()
   })
 
+  ipcMain.handle('get-system-stats-full', async () => {
+    const { getFullStats } = require('./system-stats')
+    return getFullStats()
+  })
+
   ipcMain.handle('get-now-playing', () => {
     return getNowPlaying()
   })

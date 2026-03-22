@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('shelf', {
   getLayout: () => ipcRenderer.invoke('get-layout'),
   saveLayout: (config) => ipcRenderer.invoke('save-layout', config),
   getSystemStats: () => ipcRenderer.invoke('get-system-stats'),
+  getSystemStatsFull: () => ipcRenderer.invoke('get-system-stats-full'),
   getNowPlaying: () => ipcRenderer.invoke('get-now-playing'),
   musicCommand: (cmd) => ipcRenderer.invoke('music-command', cmd),
   getPlaylists: () => ipcRenderer.invoke('get-playlists'),
