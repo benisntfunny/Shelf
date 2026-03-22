@@ -246,6 +246,96 @@ body {
   outline: none;
 }
 
+/* ── HA Entity Picker ── */
+.ha-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 6px 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.ha-selected-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.ha-selected-icon { font-size: 14px; flex-shrink: 0; }
+.ha-selected-name { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ha-selected-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.ha-selected-actions button {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ha-selected-actions button:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.ha-selected-actions button:disabled { opacity: 0.3; cursor: default; }
+.ha-selected-actions .ha-remove { color: var(--negative); }
+.ha-selected-actions .ha-remove:hover { border-color: var(--negative); }
+
+.ha-domain-list {
+  margin-top: 6px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+}
+.ha-domain-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.03);
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  gap: 6px;
+}
+.ha-domain-header:hover { background: rgba(255,255,255,0.06); }
+.ha-domain-badge {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 400;
+}
+.ha-domain-arrow { margin-left: auto; color: var(--muted); font-size: 10px; }
+
+.ha-entity-list { display: flex; flex-direction: column; }
+.ha-entity-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 20px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  color: var(--text);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: left;
+}
+.ha-entity-item:hover { background: rgba(255,255,255,0.04); }
+.ha-entity-item.selected { background: rgba(201,168,76,0.06); }
+.ha-entity-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ha-entity-state { color: var(--muted); font-size: 10px; flex-shrink: 0; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+.ha-entity-check { flex-shrink: 0; font-size: 12px; width: 16px; text-align: center; }
+.ha-entity-item.selected .ha-entity-check { color: var(--accent); font-weight: 700; }
+
 /* Checklist */
 .checklist-options {
   display: flex;
