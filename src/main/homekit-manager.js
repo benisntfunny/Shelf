@@ -1,7 +1,16 @@
-const { HttpClient, IPDiscovery } = require('hap-controller')
 const fs = require('fs')
 const path = require('path')
 const { app } = require('electron')
+
+// Lazy-load hap-controller to avoid crashes if native modules aren't compatible
+let HttpClient, IPDiscovery
+function loadHAP() {
+  if (!HttpClient) {
+    const hap = require('hap-controller')
+    HttpClient = hap.HttpClient
+    IPDiscovery = hap.IPDiscovery
+  }
+}
 
 const PAIRING_DIR = path.join(app.getPath('home'), '.shelf', 'homekit')
 const PAIRING_FILE = path.join(PAIRING_DIR, 'pairings.json')
@@ -32,6 +41,7 @@ function savePairings(pairings) {
 async function startDiscovery() {
   discoveredDevices = []
   try {
+    loadHAP()
     discovery = new IPDiscovery()
 
     return new Promise((resolve) => {
@@ -68,6 +78,7 @@ async function pairDevice(deviceId, pin) {
   if (!device) throw new Error('Device not found. Run discovery first.')
 
   try {
+    loadHAP()
     const client = new HttpClient(device.id, device.address, device.port)
     await client.pairSetup(pin)
     const pairingData = client.getLongTermData()
@@ -97,6 +108,7 @@ async function getAccessories() {
   const pairings = loadPairings()
   const results = []
 
+  loadHAP()
   for (const [id, pairing] of Object.entries(pairings)) {
     let client
     try {
@@ -156,6 +168,7 @@ async function setCharacteristic(bridgeId, aid, iid, value) {
   const pairing = pairings[bridgeId]
   if (!pairing) throw new Error('Bridge not paired')
 
+  loadHAP()
   const client = new HttpClient(bridgeId, pairing.address, pairing.port, pairing.pairingData)
   try {
     await client.setCharacteristics({ [`${aid}.${iid}`]: value })
@@ -169,6 +182,7 @@ async function unpairDevice(deviceId) {
   if (pairings[deviceId]) {
     try {
       const p = pairings[deviceId]
+      loadHAP()
       const client = new HttpClient(deviceId, p.address, p.port, p.pairingData)
       // Use the iOSDevicePairingID from the stored pairing data
       await client.removePairing(p.pairingData.iOSDevicePairingID)
