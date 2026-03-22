@@ -6,6 +6,7 @@ import { getWidgetMeta } from '../widgets/registry'
 import EditPanel from './components/EditPanel'
 import SecretsPanel from './components/SecretsPanel'
 import WidgetStore from '../store/WidgetStore'
+import { GRID_COLS, GRID_ROWS } from './constants'
 import './settings.css'
 
 const TABS = [
@@ -17,7 +18,7 @@ const TABS = [
 
 function parseSize(size) {
   const [w, h] = (size || '').split('x').map(Number)
-  return { w: w || 4, h: h || 3 }
+  return { w: w || 4, h: h || GRID_ROWS }
 }
 
 function cellsOverlap(c1, r1, w1, h1, c2, r2, w2, h2) {
@@ -25,7 +26,7 @@ function cellsOverlap(c1, r1, w1, h1, c2, r2, w2, h2) {
 }
 
 function canPlace(col, row, w, h, widgets, excludeId) {
-  if (col < 1 || row < 1 || col + w - 1 > 12 || row + h - 1 > 3) return false
+  if (col < 1 || row < 1 || col + w - 1 > GRID_COLS || row + h - 1 > GRID_ROWS) return false
   for (const other of widgets) {
     if (other.id === excludeId) continue
     const os = parseSize(other.size)
@@ -42,10 +43,10 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
     if (!gridRef.current) return { col: 1, row: 1 }
     const rect = gridRef.current.getBoundingClientRect()
     const gap = 4, pad = 4
-    const cellW = (rect.width - pad * 2 - gap * 11) / 12
-    const cellH = (rect.height - pad * 2 - gap * 2) / 3
-    const col = Math.max(1, Math.min(12, Math.round((clientX - rect.left - pad) / (cellW + gap)) + 1))
-    const row = Math.max(1, Math.min(3, Math.round((clientY - rect.top - pad) / (cellH + gap)) + 1))
+    const cellW = (rect.width - pad * 2 - gap * (GRID_COLS - 1)) / GRID_COLS
+    const cellH = (rect.height - pad * 2 - gap * (GRID_ROWS - 1)) / GRID_ROWS
+    const col = Math.max(1, Math.min(GRID_COLS, Math.round((clientX - rect.left - pad) / (cellW + gap)) + 1))
+    const row = Math.max(1, Math.min(GRID_ROWS, Math.round((clientY - rect.top - pad) / (cellH + gap)) + 1))
     return { col, row }
   }, [])
 
@@ -59,8 +60,8 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
       didDrag = true
       const { col, row } = getGridPos(ev.clientX, ev.clientY)
       // Clamp so widget doesn't extend past grid
-      const clampedCol = Math.min(col, 12 - w + 1)
-      const clampedRow = Math.min(row, 3 - h + 1)
+      const clampedCol = Math.min(col, GRID_COLS - w + 1)
+      const clampedRow = Math.min(row, GRID_ROWS - h + 1)
       const valid = canPlace(clampedCol, clampedRow, w, h, widgets, widget.id)
       setDragState({ id: widget.id, ghostCol: clampedCol, ghostRow: clampedRow, w, h, valid })
     }
@@ -68,8 +69,8 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
     function onUp(ev) {
       if (didDrag) {
         const { col, row } = getGridPos(ev.clientX, ev.clientY)
-        const clampedCol = Math.min(col, 12 - w + 1)
-        const clampedRow = Math.min(row, 3 - h + 1)
+        const clampedCol = Math.min(col, GRID_COLS - w + 1)
+        const clampedRow = Math.min(row, GRID_ROWS - h + 1)
         if (canPlace(clampedCol, clampedRow, w, h, widgets, widget.id)) {
           onMoveWidget(widget.id, clampedCol, clampedRow)
         }
@@ -95,18 +96,18 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
       if (!gridRef.current) return
       const rect = gridRef.current.getBoundingClientRect()
       const gap = 4, pad = 4
-      const cellW = (rect.width - pad * 2 - gap * 11) / 12
-      const cellH = (rect.height - pad * 2 - gap * 2) / 3
+      const cellW = (rect.width - pad * 2 - gap * (GRID_COLS - 1)) / GRID_COLS
+      const cellH = (rect.height - pad * 2 - gap * (GRID_ROWS - 1)) / GRID_ROWS
       const dx = ev.clientX - startX
       const dy = ev.clientY - startY
 
       let newW = w, newH = h
-      if (edge === 'right' || edge === 'corner') newW = Math.max(1, Math.min(12, w + Math.round(dx / cellW)))
-      if (edge === 'bottom' || edge === 'corner') newH = Math.max(1, Math.min(3, h + Math.round(dy / cellH)))
+      if (edge === 'right' || edge === 'corner') newW = Math.max(1, Math.min(GRID_COLS, w + Math.round(dx / cellW)))
+      if (edge === 'bottom' || edge === 'corner') newH = Math.max(1, Math.min(GRID_ROWS, h + Math.round(dy / cellH)))
 
       const col = widget.col || 1, row = widget.row || 1
-      if (col + newW - 1 > 12) newW = 12 - col + 1
-      if (row + newH - 1 > 3) newH = 3 - row + 1
+      if (col + newW - 1 > GRID_COLS) newW = GRID_COLS - col + 1
+      if (row + newH - 1 > GRID_ROWS) newH = GRID_ROWS - row + 1
 
       const newSize = `${newW}x${newH}`
       if (newSize !== widget.size) onSizeChange(widget.id, newSize)
