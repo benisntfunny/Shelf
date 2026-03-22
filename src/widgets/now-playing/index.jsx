@@ -1,5 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
+function useContainerSize(ref) {
+  const [size, setSize] = useState({ w: 0, h: 0 })
+  useEffect(() => {
+    if (!ref.current) return
+    const ro = new ResizeObserver(([entry]) => {
+      setSize({ w: entry.contentRect.width, h: entry.contentRect.height })
+    })
+    ro.observe(ref.current)
+    return () => ro.disconnect()
+  }, [ref])
+  return size
+}
+
 function formatTime(secs) {
   if (!secs || isNaN(secs)) return '0:00'
   const m = Math.floor(secs / 60)
@@ -252,6 +265,8 @@ export default function NowPlaying() {
   const [browsing, setBrowsing] = useState(false)
   const [localPos, setLocalPos] = useState(0)
   const lastPoll = useRef(Date.now())
+  const containerRef = useRef(null)
+  const container = useContainerSize(containerRef)
 
   useEffect(() => {
     let mounted = true
@@ -283,58 +298,69 @@ export default function NowPlaying() {
     if (window.shelf) await window.shelf.musicCommand(action)
   }
 
+  const h = container.h
+  const w = container.w
+
   if (!track || (!track.track && !track.playing)) {
     return (
-      <div className="widget-content" style={{ color: '#6a6a6a', fontSize: '5vh' }}>
+      <div ref={containerRef} className="widget-content" style={{ color: '#6a6a6a', fontSize: h ? `${h * 0.15}px` : '5vh' }}>
         Not playing
       </div>
     )
   }
 
+  const artSize = h && w ? Math.min(h * 0.7, w * 0.3) : undefined
+  const titleSize = h ? h * 0.15 : undefined
+  const artistSize = h ? h * 0.10 : undefined
+  const playBtnSize = h ? h * 0.18 : undefined
+  const prevNextSize = h ? h * 0.08 : undefined
+  const browseSize = h ? h * 0.08 : undefined
+  const artPlaceholderSize = h ? h * 0.35 : undefined
+
   return (
-    <div style={{display:'flex',flexDirection:'column',height:'100%',width:'100%',position:'relative'}}>
+    <div ref={containerRef} style={{display:'flex',flexDirection:'column',height:'100%',width:'100%',position:'relative'}}>
       {/* Main content — key triggers fade animation on track change */}
-      <div key={track.track + '|' + track.artist} style={{display:'flex',flexDirection:'row',alignItems:'center',flex:1,gap:'3vw',padding:'1.5vh 2vw',minHeight:0,animation:'fadeSlideIn 0.4s ease'}}>
+      <div key={track.track + '|' + track.artist} style={{display:'flex',flexDirection:'row',alignItems:'center',flex:1,gap: w ? `${w * 0.03}px` : '3vw',padding: h ? `${h * 0.04}px ${w * 0.02}px` : '1.5vh 2vw',minHeight:0,animation:'fadeSlideIn 0.4s ease'}}>
         {/* Album art */}
-        <div style={{width:'25vh',height:'25vh',maxWidth:'30%',borderRadius:'12px',background:'#1e1e1e',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12vh',overflow:'hidden'}}>
+        <div style={{width: artSize ? `${artSize}px` : '25vh',height: artSize ? `${artSize}px` : '25vh',maxWidth:'30%',borderRadius:'12px',background:'#1e1e1e',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize: artPlaceholderSize ? `${artPlaceholderSize}px` : '12vh',overflow:'hidden'}}>
           {track.artwork ? <img src={track.artwork} style={{width:'100%',height:'100%',objectFit:'cover',animation:'fadeIn 0.3s ease'}} alt="" /> : '\u{1F3B5}'}
         </div>
         {/* Track info */}
-        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',gap:'1vh',minWidth:0}}>
-          <MarqueeText text={track.track} style={{fontSize:'7vh',fontWeight:600,color:'#e0e0e0',lineHeight:1.1}} />
-          <div style={{fontSize:'5vh',color:'#6a6a6a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.1}}>{track.artist}</div>
-          <div style={{display:'flex',gap:'3vw',marginTop:'0.5vh'}}>
-            <button onClick={() => cmd('previous')} style={{fontSize:'8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23EE'}</button>
-            <button onClick={() => cmd('playpause')} style={{fontSize:'9vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.9,padding:0,lineHeight:1}}>{track.playing ? '\u23F8' : '\u25B6'}</button>
-            <button onClick={() => cmd('next')} style={{fontSize:'8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23ED'}</button>
+        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',gap: h ? `${h * 0.02}px` : '1vh',minWidth:0}}>
+          <MarqueeText text={track.track} style={{fontSize: titleSize ? `${titleSize}px` : '7vh',fontWeight:600,color:'#e0e0e0',lineHeight:1.1}} />
+          <div style={{fontSize: artistSize ? `${artistSize}px` : '5vh',color:'#6a6a6a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.1}}>{track.artist}</div>
+          <div style={{display:'flex',gap: w ? `${w * 0.03}px` : '3vw',marginTop: h ? `${h * 0.01}px` : '0.5vh'}}>
+            <button onClick={() => cmd('previous')} style={{fontSize: playBtnSize ? `${playBtnSize}px` : '8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23EE'}</button>
+            <button onClick={() => cmd('playpause')} style={{fontSize: playBtnSize ? `${playBtnSize * 1.1}px` : '9vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.9,padding:0,lineHeight:1}}>{track.playing ? '\u23F8' : '\u25B6'}</button>
+            <button onClick={() => cmd('next')} style={{fontSize: playBtnSize ? `${playBtnSize}px` : '8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23ED'}</button>
           </div>
         </div>
       </div>
       {/* Prev/Next track bar */}
       {(track.prevTrack || track.nextTrack) && (
         <div style={{display:'flex',borderTop:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
-          <button onClick={() => cmd('previous')} style={{flex:1,padding:'1vh 2vw',cursor:'pointer',overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis',borderRight:'1px solid rgba(255,255,255,0.06)',background:'none',border:'none',borderRight:'1px solid rgba(255,255,255,0.06)',textAlign:'left',touchAction:'manipulation'}}>
+          <button onClick={() => cmd('previous')} style={{flex:1,padding: h ? `${h * 0.02}px ${w * 0.02}px` : '1vh 2vw',cursor:'pointer',overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis',background:'none',border:'none',borderRight:'1px solid rgba(255,255,255,0.06)',textAlign:'left',touchAction:'manipulation'}}>
             {track.prevTrack ? (
               <>
-                <span style={{fontSize:'2.5vh',color:'#6a6a6a',marginRight:'0.5vw'}}>{'\u23EE'}</span>
-                <span style={{fontSize:'2.8vh',color:'#8a8a8a'}}>{track.prevTrack.name}</span>
-                <span style={{fontSize:'2.2vh',color:'#6a6a6a',marginLeft:'0.5vw'}}>{track.prevTrack.artist}</span>
+                <span style={{fontSize: prevNextSize ? `${prevNextSize}px` : '2.5vh',color:'#6a6a6a',marginRight: w ? `${w * 0.005}px` : '0.5vw'}}>{'\u23EE'}</span>
+                <span style={{fontSize: prevNextSize ? `${prevNextSize * 1.1}px` : '2.8vh',color:'#8a8a8a'}}>{track.prevTrack.name}</span>
+                <span style={{fontSize: prevNextSize ? `${prevNextSize * 0.9}px` : '2.2vh',color:'#6a6a6a',marginLeft: w ? `${w * 0.005}px` : '0.5vw'}}>{track.prevTrack.artist}</span>
               </>
-            ) : <span style={{fontSize:'2.5vh',color:'#4a4a4a'}}>&nbsp;</span>}
+            ) : <span style={{fontSize: prevNextSize ? `${prevNextSize}px` : '2.5vh',color:'#4a4a4a'}}>&nbsp;</span>}
           </button>
-          <button onClick={() => cmd('next')} style={{flex:1,padding:'1vh 2vw',cursor:'pointer',overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis',textAlign:'right',background:'none',border:'none',touchAction:'manipulation'}}>
+          <button onClick={() => cmd('next')} style={{flex:1,padding: h ? `${h * 0.02}px ${w * 0.02}px` : '1vh 2vw',cursor:'pointer',overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis',textAlign:'right',background:'none',border:'none',touchAction:'manipulation'}}>
             {track.nextTrack ? (
               <>
-                <span style={{fontSize:'2.8vh',color:'#8a8a8a'}}>{track.nextTrack.name}</span>
-                <span style={{fontSize:'2.2vh',color:'#6a6a6a',marginLeft:'0.5vw'}}>{track.nextTrack.artist}</span>
-                <span style={{fontSize:'2.5vh',color:'#6a6a6a',marginLeft:'0.5vw'}}>{'\u23ED'}</span>
+                <span style={{fontSize: prevNextSize ? `${prevNextSize * 1.1}px` : '2.8vh',color:'#8a8a8a'}}>{track.nextTrack.name}</span>
+                <span style={{fontSize: prevNextSize ? `${prevNextSize * 0.9}px` : '2.2vh',color:'#6a6a6a',marginLeft: w ? `${w * 0.005}px` : '0.5vw'}}>{track.nextTrack.artist}</span>
+                <span style={{fontSize: prevNextSize ? `${prevNextSize}px` : '2.5vh',color:'#6a6a6a',marginLeft: w ? `${w * 0.005}px` : '0.5vw'}}>{'\u23ED'}</span>
               </>
-            ) : <span style={{fontSize:'2.5vh',color:'#4a4a4a'}}>&nbsp;</span>}
+            ) : <span style={{fontSize: prevNextSize ? `${prevNextSize}px` : '2.5vh',color:'#4a4a4a'}}>&nbsp;</span>}
           </button>
         </div>
       )}
       {/* Browse button */}
-      <button onClick={() => setBrowsing(true)} style={{position:'absolute',top:'1.5vh',right:'1.5vw',padding:'0.8vh 1.5vw',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'12px',color:'#6a6a6a',fontSize:'3.5vh',cursor:'pointer'}}>Browse</button>
+      <button onClick={() => setBrowsing(true)} style={{position:'absolute',top: h ? `${h * 0.04}px` : '1.5vh',right: w ? `${w * 0.015}px` : '1.5vw',padding: h ? `${h * 0.02}px ${w * 0.015}px` : '0.8vh 1.5vw',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'12px',color:'#6a6a6a',fontSize: browseSize ? `${browseSize}px` : '3.5vh',cursor:'pointer'}}>Browse</button>
       {browsing && <div style={{position:'absolute',inset:0,animation:'slideUp 0.3s ease'}}><BrowseOverlay onClose={() => setBrowsing(false)} /></div>}
     </div>
   )

@@ -190,20 +190,20 @@ function PairingUI() {
   }
 
   return (
-    <div style={{padding:'8px',display:'flex',flexDirection:'column',gap:'6px',height:'100%'}}>
-      <div style={{fontSize:'11px',color:'#6a6a6a',textAlign:'center'}}>No HomeKit devices paired</div>
+    <div style={{padding:'12px',display:'flex',flexDirection:'column',gap:'10px',height:'100%',alignItems:'center',justifyContent:'center'}}>
+      <div style={{fontSize:'14px',color:'#6a6a6a',textAlign:'center'}}>No HomeKit devices paired</div>
       <button onClick={discover} disabled={discovering} data-no-swipe
-        style={{padding:'6px 12px',borderRadius:'6px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.04)',color:'#c9a84c',fontSize:'11px',cursor:'pointer',touchAction:'manipulation',alignSelf:'center'}}>
+        style={{padding:'10px 20px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.04)',color:'#c9a84c',fontSize:'14px',cursor:'pointer',touchAction:'manipulation',alignSelf:'center'}}>
         {discovering ? 'Searching...' : 'Discover Devices'}
       </button>
 
       {devices.length > 0 && !pairing && (
-        <div style={{overflow:'auto',flex:1}}>
+        <div style={{overflow:'auto',flex:1,width:'100%'}}>
           {devices.map(d => (
-            <div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'4px 0',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
-              <span style={{fontSize:'11px',color:'#e0e0e0'}}>{d.name}</span>
+            <div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 4px',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+              <span style={{fontSize:'14px',color:'#e0e0e0'}}>{d.name}</span>
               <button onClick={() => setPairing(d.id)} data-no-swipe
-                style={{padding:'2px 8px',borderRadius:'4px',border:'1px solid rgba(255,255,255,0.1)',background:'none',color:'#c9a84c',fontSize:'10px',cursor:'pointer',touchAction:'manipulation'}}>
+                style={{padding:'6px 14px',borderRadius:'6px',border:'1px solid rgba(255,255,255,0.1)',background:'none',color:'#c9a84c',fontSize:'13px',cursor:'pointer',touchAction:'manipulation'}}>
                 Pair
               </button>
             </div>
@@ -212,19 +212,19 @@ function PairingUI() {
       )}
 
       {pairing && (
-        <div style={{display:'flex',flexDirection:'column',gap:'4px',alignItems:'center'}}>
-          <span style={{fontSize:'10px',color:'#8a8a8a'}}>Enter HomeKit PIN:</span>
+        <div style={{display:'flex',flexDirection:'column',gap:'8px',alignItems:'center'}}>
+          <span style={{fontSize:'13px',color:'#8a8a8a'}}>Enter HomeKit PIN:</span>
           <input type="text" value={pin} onChange={e => setPin(e.target.value)} placeholder="123-45-678"
-            style={{padding:'4px 8px',borderRadius:'4px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(0,0,0,0.3)',color:'#e0e0e0',fontSize:'12px',textAlign:'center',width:'120px'}} />
-          <div style={{display:'flex',gap:'4px'}}>
-            <button onClick={pair} data-no-swipe style={{padding:'3px 10px',borderRadius:'4px',background:'#c9a84c',color:'#000',border:'none',fontSize:'10px',fontWeight:600,cursor:'pointer',touchAction:'manipulation'}}>Pair</button>
-            <button onClick={() => { setPairing(null); setPin('') }} data-no-swipe style={{padding:'3px 10px',borderRadius:'4px',background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'#6a6a6a',fontSize:'10px',cursor:'pointer',touchAction:'manipulation'}}>Cancel</button>
+            style={{padding:'8px 12px',borderRadius:'6px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(0,0,0,0.3)',color:'#e0e0e0',fontSize:'16px',textAlign:'center',width:'160px'}} />
+          <div style={{display:'flex',gap:'8px'}}>
+            <button onClick={pair} data-no-swipe style={{padding:'8px 16px',borderRadius:'6px',background:'#c9a84c',color:'#000',border:'none',fontSize:'13px',fontWeight:600,cursor:'pointer',touchAction:'manipulation'}}>Pair</button>
+            <button onClick={() => { setPairing(null); setPin('') }} data-no-swipe style={{padding:'8px 16px',borderRadius:'6px',background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'#6a6a6a',fontSize:'13px',cursor:'pointer',touchAction:'manipulation'}}>Cancel</button>
           </div>
         </div>
       )}
 
-      {error && <div style={{fontSize:'10px',color:'#cf6679',textAlign:'center'}}>{error}</div>}
-      {success && <div style={{fontSize:'10px',color:'#4caf82',textAlign:'center'}}>{success}</div>}
+      {error && <div style={{fontSize:'13px',color:'#cf6679',textAlign:'center'}}>{error}</div>}
+      {success && <div style={{fontSize:'13px',color:'#4caf82',textAlign:'center'}}>{success}</div>}
     </div>
   )
 }
