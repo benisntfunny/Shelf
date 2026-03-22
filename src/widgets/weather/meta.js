@@ -1,1 +1,1 @@
-export default { id: 'weather', name: 'Weather', description: 'Current weather conditions', icon: '\u{26C5}', defaultSize: '2x2', sizes: ['2x2', '4x2', '4x3', '12x1'] }
+export default { id: 'weather', name: 'Weather', description: 'Current weather conditions', icon: '\u{26C5}', defaultSize: '4x6', sizes: ['2x3', '2x6', '4x3', '4x6', '12x2'] }
