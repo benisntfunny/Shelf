@@ -210,6 +210,64 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
     }
   })
 
+  ipcMain.handle('homekit-discover', async () => {
+    try {
+      const { startDiscovery } = require('./homekit-manager')
+      const devices = await startDiscovery()
+      return { ok: true, devices }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('homekit-pair', async (_event, { deviceId, pin }) => {
+    try {
+      const { pairDevice } = require('./homekit-manager')
+      const result = await pairDevice(deviceId, pin)
+      return { ok: true, ...result }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('homekit-accessories', async () => {
+    try {
+      const { getAccessories } = require('./homekit-manager')
+      return { ok: true, accessories: await getAccessories() }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('homekit-control', async (_event, { bridgeId, aid, iid, value }) => {
+    try {
+      const { setCharacteristic } = require('./homekit-manager')
+      await setCharacteristic(bridgeId, aid, iid, value)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('homekit-unpair', async (_event, deviceId) => {
+    try {
+      const { unpairDevice } = require('./homekit-manager')
+      await unpairDevice(deviceId)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('homekit-paired-devices', async () => {
+    try {
+      const { getPairedDevices } = require('./homekit-manager')
+      return { ok: true, devices: getPairedDevices() }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
   ipcMain.handle('fetch-url', async (_event, url) => {
     const https = require('https')
     const http = require('http')

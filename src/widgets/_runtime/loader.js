@@ -9,6 +9,7 @@ import pageSwitcherWidget from '../page-switcher/widget'
 import shortcutsWidget from '../shortcuts/widget'
 import computerStatsWidget from '../computer-stats/widget'
 import homeAssistantWidget from '../home-assistant/widget'
+import appleHomeWidget from '../apple-home/widget'
 
 const builtinWidgets = [
   clockWidget,
@@ -22,6 +23,7 @@ const builtinWidgets = [
   shortcutsWidget,
   computerStatsWidget,
   homeAssistantWidget,
+  appleHomeWidget,
 ]
 
 // Installed widgets (user-installed from ~/.shelf/widgets/<id>/index.js)
