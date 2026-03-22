@@ -198,10 +198,13 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
 export default function SettingsApp() {
   const { layout, loaded, pages, activePage, setActivePage,
     addPage, removePage, renamePage,
-    addWidget, removeWidget, updateWidgetConfig, updateWidgetSize, moveWidget } = useLayout()
+    addWidget, removeWidget, updateWidgetConfig, updateWidgetSize, moveWidget, undo } = useLayout()
   const { selectedWidgetId, selectWidget } = useEditMode()
   const { secrets, loaded: secretsLoaded, updateSecret } = useSecrets()
   const [activeTab, setActiveTab] = useState('layout')
+  const [newPageName, setNewPageName] = useState('')
+  const [addingPage, setAddingPage] = useState(false)
+  const [renamingPage, setRenamingPage] = useState(false)
 
   if (!loaded || !secretsLoaded) return (
     <div style={{ color: '#999', padding: 40, fontFamily: 'system-ui', textAlign: 'center' }}>
@@ -237,17 +240,67 @@ export default function SettingsApp() {
                   <button key={p.id} className={`page-tab${p.id === activePage ? ' active' : ''}`}
                     onClick={() => setActivePage(p.id)}>{p.name}</button>
                 ))}
-                <button className="page-tab add" onClick={() => {
-                  const name = window.prompt('Page name:')
-                  if (name?.trim()) addPage(name.trim())
-                }}>+</button>
+                {addingPage ? (
+                  <input
+                    className="page-tab-input"
+                    autoFocus
+                    placeholder="Page name"
+                    value={newPageName}
+                    onChange={(e) => setNewPageName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newPageName.trim()) {
+                        addPage(newPageName.trim())
+                        setNewPageName('')
+                        setAddingPage(false)
+                      }
+                      if (e.key === 'Escape') {
+                        setNewPageName('')
+                        setAddingPage(false)
+                      }
+                    }}
+                    onBlur={() => {
+                      if (newPageName.trim()) {
+                        addPage(newPageName.trim())
+                      }
+                      setNewPageName('')
+                      setAddingPage(false)
+                    }}
+                  />
+                ) : (
+                  <button className="page-tab add" onClick={() => setAddingPage(true)}>+</button>
+                )}
               </div>
               {pages.length > 1 && (
                 <div className="page-actions">
-                  <button className="page-action" onClick={() => {
-                    const name = window.prompt('Rename page:', pages.find(p => p.id === activePage)?.name)
-                    if (name?.trim()) renamePage(activePage, name.trim())
-                  }}>Rename</button>
+                  {renamingPage ? (
+                    <input
+                      className="page-tab-input"
+                      autoFocus
+                      value={newPageName}
+                      onChange={(e) => setNewPageName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newPageName.trim()) {
+                          renamePage(activePage, newPageName.trim())
+                          setNewPageName('')
+                          setRenamingPage(false)
+                        }
+                        if (e.key === 'Escape') {
+                          setNewPageName('')
+                          setRenamingPage(false)
+                        }
+                      }}
+                      onBlur={() => {
+                        if (newPageName.trim()) renamePage(activePage, newPageName.trim())
+                        setNewPageName('')
+                        setRenamingPage(false)
+                      }}
+                    />
+                  ) : (
+                    <button className="page-action" onClick={() => {
+                      setNewPageName(pages.find(p => p.id === activePage)?.name || '')
+                      setRenamingPage(true)
+                    }}>Rename</button>
+                  )}
                   <button className="page-action delete" onClick={() => {
                     const page = pages.find(p => p.id === activePage)
                     if (page?.widgets?.length > 0) {
