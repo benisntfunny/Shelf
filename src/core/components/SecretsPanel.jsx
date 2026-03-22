@@ -1,14 +1,35 @@
 import { useState } from 'react'
-import { getAllWidgets, getWidgetConfig } from '../../widgets/registry'
+import { getAllWidgets, getWidgetConfig, getAllSecretsSchema } from '../../widgets/registry'
 
 function getRequiredKeys() {
   const keys = []
+
+  // New: secretsSchema (flat keys, shared across instances)
+  for (const field of getAllSecretsSchema()) {
+    keys.push({
+      key: field.key,
+      label: field.label,
+      placeholder: field.placeholder || '',
+      isSecret: field.secret !== false,
+      widgetName: field.widgetName,
+      source: 'secretsSchema',
+    })
+  }
+
+  // Legacy: configSchema fields with secret: true
   for (const meta of getAllWidgets()) {
     const config = getWidgetConfig(meta.id)
     if (!config?.schema) continue
     for (const field of config.schema) {
       if (field.secret) {
-        keys.push({ widgetId: meta.id, widgetName: meta.name, key: field.key, label: field.label })
+        keys.push({
+          key: `${meta.id}.${field.key}`,
+          label: field.label,
+          placeholder: '',
+          isSecret: true,
+          widgetName: meta.name,
+          source: 'configSchema',
+        })
       }
     }
   }
@@ -31,31 +52,33 @@ export default function SecretsPanel({ secrets, onUpdateSecret }) {
   return (
     <div className="secrets-panel">
       <h3>API Keys</h3>
-      {requiredKeys.map(({ widgetId, widgetName, key, label }) => {
-        const secretKey = `${widgetId}.${key}`
-        const hasValue = !!secrets[secretKey]
+      {requiredKeys.map(({ key, label, placeholder, isSecret, widgetName }) => {
+        const hasValue = !!secrets[key]
         return (
-          <div key={secretKey} className="config-field">
-            <label>{widgetName} - {label}</label>
+          <div key={key} className="config-field">
+            <label>
+              {widgetName} - {label}
+              {!hasValue && <span style={{ color: 'var(--negative)', marginLeft: 6, fontSize: 11 }}>not set</span>}
+            </label>
             <div style={{ display: 'flex', gap: 4 }}>
               <input
-                type="password"
-                value={editing[secretKey] ?? (hasValue ? '••••••••' : '')}
-                onChange={(e) => setEditing({ ...editing, [secretKey]: e.target.value })}
+                type={isSecret ? 'password' : 'text'}
+                value={editing[key] ?? (hasValue ? (isSecret ? '••••••••' : secrets[key]) : '')}
+                onChange={(e) => setEditing({ ...editing, [key]: e.target.value })}
                 onFocus={() => {
-                  if (editing[secretKey] === undefined) setEditing({ ...editing, [secretKey]: '' })
+                  if (editing[key] === undefined) setEditing({ ...editing, [key]: '' })
                 }}
                 onBlur={() => {
-                  if (editing[secretKey] !== undefined && editing[secretKey] !== '') {
-                    onUpdateSecret(secretKey, editing[secretKey])
+                  if (editing[key] !== undefined && editing[key] !== '') {
+                    onUpdateSecret(key, editing[key])
                   }
                   setEditing((prev) => {
                     const next = { ...prev }
-                    delete next[secretKey]
+                    delete next[key]
                     return next
                   })
                 }}
-                placeholder="Enter API key..."
+                placeholder={placeholder || 'Enter API key...'}
                 style={{
                   flex: 1,
                   padding: '6px 10px',

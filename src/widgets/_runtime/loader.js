@@ -64,6 +64,20 @@ export function installWidget(widget) {
   widgetMap.set(widget.id, widget)
 }
 
+export function getAllSecretsSchema() {
+  const seen = new Set()
+  const result = []
+  for (const widget of widgetMap.values()) {
+    if (!widget.secretsSchema) continue
+    for (const field of widget.secretsSchema) {
+      if (seen.has(field.key)) continue
+      seen.add(field.key)
+      result.push({ ...field, widgetId: widget.id, widgetName: widget.name })
+    }
+  }
+  return result
+}
+
 export function removeWidget(widgetId) {
   if (isBuiltin(widgetId)) return false
   installedWidgets.delete(widgetId)

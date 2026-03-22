@@ -55,27 +55,28 @@ function ForecastPanel({ data, onClose }) {
   )
 }
 
-export default function Weather({ config, size }) {
+export default function Weather({ config, secrets, size }) {
   const [weatherData, setWeatherData] = useState([])
   const [selectedIdx, setSelectedIdx] = useState(0)
   const [showForecast, setShowForecast] = useState(false)
 
   const cities = config?.cities?.length ? config.cities.slice(0, 3) : ['San Francisco']
   const units = config?.units || 'F'
+  const apiKey = secrets?.['openweathermap_key'] || secrets?.['weather.openweathermap_key'] || null
 
   useEffect(() => {
     let mounted = true
     async function fetchAll() {
       if (!window.shelf?.getWeatherByCity) return
       const results = await Promise.all(
-        cities.map((city) => window.shelf.getWeatherByCity({ city, units }))
+        cities.map((city) => window.shelf.getWeatherByCity({ city, units, apiKey }))
       )
       if (mounted) setWeatherData(results)
     }
     fetchAll()
     const timer = setInterval(fetchAll, 15 * 60 * 1000)
     return () => { mounted = false; clearInterval(timer) }
-  }, [cities.join(','), units])
+  }, [cities.join(','), units, apiKey])
 
   useEffect(() => { setSelectedIdx(0) }, [cities.join(',')])
 
