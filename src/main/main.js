@@ -19,7 +19,20 @@ try {
 app.commandLine.appendSwitch('touch-events', 'enabled')
 app.commandLine.appendSwitch('enable-features', 'TouchpadAndWheelScrollLatching,AsyncWheelEvents')
 
-Menu.setApplicationMenu(null)
+Menu.setApplicationMenu(Menu.buildFromTemplate([
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'selectAll' },
+    ]
+  }
+]))
 
 let barWindow = null
 let settingsWindow = null
