@@ -65,11 +65,11 @@ body {
   position: relative;
 }
 
-/* ── Widget Bar: 12x3 grid ── */
+/* ── Widget Bar: 12x6 grid ── */
 .widget-bar {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(6, 1fr);
   height: 100%;
   padding: 6px 8px;
   gap: 6px;

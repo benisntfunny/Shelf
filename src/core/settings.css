@@ -68,14 +68,14 @@
 .preview-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(6, 1fr);
   grid-auto-flow: dense;
   gap: 4px;
   background: var(--bg);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   padding: 4px;
-  height: 160px;
+  height: 200px;
 }
 
 .preview-cell {
