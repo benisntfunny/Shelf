@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback, useState, useRef } from 'react'
 import { useLayout } from './hooks/useLayout'
+import { useSwipe } from './hooks/useSwipe'
 import WidgetBar from './components/WidgetBar'
 
 export default function App() {
   const { layout, loaded, reload, pages, activePage, setActivePage } = useLayout()
+  const [transitioning, setTransitioning] = useState(null)
+  const barRef = useRef(null)
 
   useEffect(() => {
     if (window.shelf?.onLayoutChanged) {
@@ -11,18 +14,45 @@ export default function App() {
     }
   }, [reload])
 
+  const switchPage = useCallback((pageId) => {
+    setTransitioning('exit')
+    setTimeout(() => {
+      setActivePage(pageId)
+      setTransitioning('enter')
+      setTimeout(() => setTransitioning(null), 200)
+    }, 200)
+  }, [setActivePage])
+
+  const goNext = useCallback(() => {
+    const idx = pages.findIndex(p => p.id === activePage)
+    if (idx < pages.length - 1) switchPage(pages[idx + 1].id)
+  }, [pages, activePage, switchPage])
+
+  const goPrev = useCallback(() => {
+    const idx = pages.findIndex(p => p.id === activePage)
+    if (idx > 0) switchPage(pages[idx - 1].id)
+  }, [pages, activePage, switchPage])
+
+  const { onTouchStart, onTouchEnd } = useSwipe({
+    onSwipeLeft: goNext,
+    onSwipeRight: goPrev,
+  })
+
   if (!loaded) return null
 
+  const barClass = transitioning === 'exit' ? 'page-exit' :
+                   transitioning === 'enter' ? 'page-enter' : ''
+
   return (
-    <div className="app">
-      <WidgetBar widgets={layout.widgets} />
+    <div className="app" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <WidgetBar widgets={layout.widgets} className={barClass} />
       {pages.length > 1 && (
         <div className="page-indicator">
           {pages.map(p => (
             <div
               key={p.id}
               className={`page-dot${p.id === activePage ? ' active' : ''}`}
-              onClick={() => setActivePage(p.id)}
+              onClick={() => switchPage(p.id)}
             />
           ))}
         </div>
