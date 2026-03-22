@@ -491,3 +491,43 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+
+/* ── Page Indicator ── */
+.page-indicator {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.page-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+}
+
+/* ── Page Transition ── */
+.widget-bar {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.widget-bar.page-exit {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.widget-bar.page-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
