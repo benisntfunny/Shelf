@@ -381,3 +381,11 @@
   background: rgba(255, 255, 255, 0.1);
   color: var(--text);
 }
+
+.preview-icon img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+}

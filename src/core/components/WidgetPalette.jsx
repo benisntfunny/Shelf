@@ -13,7 +13,13 @@ export default function WidgetPalette({ onAddWidget }) {
             className="palette-card"
             onClick={() => onAddWidget(w.id, w.defaultSize)}
           >
-            <div className="icon">{w.icon}</div>
+            <div className="icon">
+              {typeof w.icon === 'string' && w.icon.endsWith('.png') ? (
+                <img src={w.icon} alt={w.name} />
+              ) : (
+                w.icon
+              )}
+            </div>
             <div className="name">{w.name}</div>
           </div>
         ))}
