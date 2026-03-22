@@ -186,42 +186,53 @@
 .preview-cell:hover .preview-resize,
 .preview-cell.selected .preview-resize { opacity: 0.8; }
 
+/* Edge handles */
 .preview-resize-right {
-  top: 0;
-  right: 0;
-  width: 8px;
-  height: 100%;
-  cursor: ew-resize;
-  border-radius: 0 6px 6px 0;
+  top: 0; right: 0; width: 8px; height: 100%;
+  cursor: ew-resize; border-radius: 0 6px 6px 0;
 }
-
-.preview-resize-right:hover {
-  background: rgba(201, 168, 76, 0.2);
+.preview-resize-left {
+  top: 0; left: 0; width: 8px; height: 100%;
+  cursor: ew-resize; border-radius: 6px 0 0 6px;
 }
-
 .preview-resize-bottom {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 8px;
-  cursor: ns-resize;
-  border-radius: 0 0 6px 6px;
+  bottom: 0; left: 0; width: 100%; height: 8px;
+  cursor: ns-resize; border-radius: 0 0 6px 6px;
+}
+.preview-resize-top {
+  top: 0; left: 0; width: 100%; height: 8px;
+  cursor: ns-resize; border-radius: 6px 6px 0 0;
 }
 
-.preview-resize-bottom:hover {
+.preview-resize-right:hover,
+.preview-resize-left:hover,
+.preview-resize-bottom:hover,
+.preview-resize-top:hover {
   background: rgba(201, 168, 76, 0.2);
 }
 
-.preview-resize-corner {
-  bottom: 0;
-  right: 0;
-  width: 14px;
-  height: 14px;
-  cursor: nwse-resize;
-  border-radius: 0 0 6px 0;
+/* Corner handles */
+.preview-resize-corner-br {
+  bottom: 0; right: 0; width: 14px; height: 14px;
+  cursor: nwse-resize; border-radius: 0 0 6px 0;
+}
+.preview-resize-corner-tl {
+  top: 0; left: 0; width: 14px; height: 14px;
+  cursor: nwse-resize; border-radius: 6px 0 0 0;
+}
+.preview-resize-corner-tr {
+  top: 0; right: 0; width: 14px; height: 14px;
+  cursor: nesw-resize; border-radius: 0 6px 0 0;
+}
+.preview-resize-corner-bl {
+  bottom: 0; left: 0; width: 14px; height: 14px;
+  cursor: nesw-resize; border-radius: 0 0 0 6px;
 }
 
-.preview-resize-corner:hover {
+.preview-resize-corner-br:hover,
+.preview-resize-corner-tl:hover,
+.preview-resize-corner-tr:hover,
+.preview-resize-corner-bl:hover {
   background: rgba(201, 168, 76, 0.3);
 }
 

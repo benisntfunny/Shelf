@@ -91,6 +91,13 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
     const { w, h } = parseSize(widget.size)
     const startX = e.clientX
     const startY = e.clientY
+    const origCol = widget.col || 1
+    const origRow = widget.row || 1
+
+    const resizeRight = edge.includes('right') || edge === 'corner-br' || edge === 'corner-tr'
+    const resizeLeft = edge.includes('left') || edge === 'corner-bl' || edge === 'corner-tl'
+    const resizeBottom = edge.includes('bottom') || edge === 'corner-bl' || edge === 'corner-br'
+    const resizeTop = edge.includes('top') || edge === 'corner-tl' || edge === 'corner-tr'
 
     function onMoveResize(ev) {
       if (!gridRef.current) return
@@ -101,16 +108,34 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
       const dx = ev.clientX - startX
       const dy = ev.clientY - startY
 
-      let newW = w, newH = h
-      if (edge === 'right' || edge === 'corner') newW = Math.max(1, Math.min(GRID_COLS, w + Math.round(dx / cellW)))
-      if (edge === 'bottom' || edge === 'corner') newH = Math.max(1, Math.min(GRID_ROWS, h + Math.round(dy / cellH)))
+      let newW = w, newH = h, newCol = origCol, newRow = origRow
 
-      const col = widget.col || 1, row = widget.row || 1
-      if (col + newW - 1 > GRID_COLS) newW = GRID_COLS - col + 1
-      if (row + newH - 1 > GRID_ROWS) newH = GRID_ROWS - row + 1
+      if (resizeRight) {
+        newW = Math.max(1, w + Math.round(dx / cellW))
+        if (newCol + newW - 1 > GRID_COLS) newW = GRID_COLS - newCol + 1
+      }
+      if (resizeLeft) {
+        const delta = Math.round(dx / cellW)
+        newCol = Math.max(1, origCol + delta)
+        newW = Math.max(1, w - (newCol - origCol))
+      }
+      if (resizeBottom) {
+        newH = Math.max(1, h + Math.round(dy / cellH))
+        if (newRow + newH - 1 > GRID_ROWS) newH = GRID_ROWS - newRow + 1
+      }
+      if (resizeTop) {
+        const delta = Math.round(dy / cellH)
+        newRow = Math.max(1, origRow + delta)
+        newH = Math.max(1, h - (newRow - origRow))
+      }
 
       const newSize = `${newW}x${newH}`
-      if (newSize !== widget.size) onSizeChange(widget.id, newSize)
+      const sizeChanged = newSize !== widget.size
+      const posChanged = newCol !== (widget.col || 1) || newRow !== (widget.row || 1)
+      if (sizeChanged || posChanged) {
+        if (posChanged) onMoveWidget(widget.id, newCol, newRow)
+        if (sizeChanged) onSizeChange(widget.id, newSize)
+      }
     }
 
     function onUp() {
@@ -155,9 +180,14 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
             <span className="preview-label">{meta?.name || widget.widgetId}</span>
             <span className="preview-size">{widget.size}</span>
             <button className="preview-remove" onClick={(e) => { e.stopPropagation(); onRemove(widget.id) }}>x</button>
-            <div className="preview-resize preview-resize-right" onMouseDown={(e) => handleResizeStart(e, widget, 'right')} />
+            <div className="preview-resize preview-resize-top" onMouseDown={(e) => handleResizeStart(e, widget, 'top')} />
             <div className="preview-resize preview-resize-bottom" onMouseDown={(e) => handleResizeStart(e, widget, 'bottom')} />
-            <div className="preview-resize preview-resize-corner" onMouseDown={(e) => handleResizeStart(e, widget, 'corner')} />
+            <div className="preview-resize preview-resize-left" onMouseDown={(e) => handleResizeStart(e, widget, 'left')} />
+            <div className="preview-resize preview-resize-right" onMouseDown={(e) => handleResizeStart(e, widget, 'right')} />
+            <div className="preview-resize preview-resize-corner-tl" onMouseDown={(e) => handleResizeStart(e, widget, 'corner-tl')} />
+            <div className="preview-resize preview-resize-corner-tr" onMouseDown={(e) => handleResizeStart(e, widget, 'corner-tr')} />
+            <div className="preview-resize preview-resize-corner-bl" onMouseDown={(e) => handleResizeStart(e, widget, 'corner-bl')} />
+            <div className="preview-resize preview-resize-corner-br" onMouseDown={(e) => handleResizeStart(e, widget, 'corner-br')} />
           </div>
         )
       })}
