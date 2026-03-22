@@ -15,6 +15,39 @@ export default function ConfigField({ field, value, onChange }) {
     )
   }
 
+  if (field.type === 'checklist') {
+    const selected = Array.isArray(value) ? value : []
+    return (
+      <div className="config-field checklist-field">
+        <label>{field.label}</label>
+        <div className="checklist-options">
+          {(field.options || []).map((opt) => {
+            const isObj = typeof opt === 'object'
+            const val = isObj ? opt.value : opt
+            const lbl = isObj ? opt.label : opt
+            const checked = selected.includes(val)
+            return (
+              <button
+                key={val}
+                className={`checklist-option${checked ? ' checked' : ''}`}
+                onClick={() => {
+                  if (checked) {
+                    onChange(selected.filter(v => v !== val))
+                  } else {
+                    onChange([...selected, val])
+                  }
+                }}
+              >
+                <span className="checklist-check">{checked ? '✓' : ''}</span>
+                {lbl}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
   if (field.type === 'select') {
     return (
       <div className="config-field">
