@@ -166,7 +166,9 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
 }
 
 export default function SettingsApp() {
-  const { layout, loaded, addWidget, removeWidget, updateWidgetConfig, updateWidgetSize, moveWidget } = useLayout()
+  const { layout, loaded, pages, activePage, setActivePage,
+    addPage, removePage, renamePage,
+    addWidget, removeWidget, updateWidgetConfig, updateWidgetSize, moveWidget } = useLayout()
   const { selectedWidgetId, selectWidget } = useEditMode()
   const { secrets, loaded: secretsLoaded, updateSecret } = useSecrets()
   const [activeTab, setActiveTab] = useState('layout')
@@ -199,8 +201,36 @@ export default function SettingsApp() {
       <div className="settings-content">
         {activeTab === 'layout' && (
           <>
+            <section className="settings-pages">
+              <div className="page-tabs">
+                {pages.map(p => (
+                  <button key={p.id} className={`page-tab${p.id === activePage ? ' active' : ''}`}
+                    onClick={() => setActivePage(p.id)}>{p.name}</button>
+                ))}
+                <button className="page-tab add" onClick={() => {
+                  const name = window.prompt('Page name:')
+                  if (name?.trim()) addPage(name.trim())
+                }}>+</button>
+              </div>
+              {pages.length > 1 && (
+                <div className="page-actions">
+                  <button className="page-action" onClick={() => {
+                    const name = window.prompt('Rename page:', pages.find(p => p.id === activePage)?.name)
+                    if (name?.trim()) renamePage(activePage, name.trim())
+                  }}>Rename</button>
+                  <button className="page-action delete" onClick={() => {
+                    const page = pages.find(p => p.id === activePage)
+                    if (page?.widgets?.length > 0) {
+                      if (!window.confirm(`Delete "${page.name}"? It has ${page.widgets.length} widget(s).`)) return
+                    }
+                    removePage(activePage)
+                  }}>Delete Page</button>
+                </div>
+              )}
+            </section>
+
             <section className="settings-preview">
-              <h2>Bar Preview</h2>
+              <h2>Bar Preview — {pages.find(p => p.id === activePage)?.name || 'Page'}</h2>
               <BarPreview
                 widgets={layout.widgets}
                 selectedWidgetId={selectedWidgetId}
