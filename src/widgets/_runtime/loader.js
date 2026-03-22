@@ -8,6 +8,7 @@ import felixStatusWidget from '../felix-status/widget'
 import calendarWidget from '../calendar/widget'
 import displayWidget from '../display/widget'
 import volumeWidget from '../volume/widget'
+import pageSwitcherWidget from '../page-switcher/widget'
 
 const builtinWidgets = [
   clockWidget,
@@ -20,6 +21,7 @@ const builtinWidgets = [
   calendarWidget,
   displayWidget,
   volumeWidget,
+  pageSwitcherWidget,
 ]
 
 // Installed widgets (user-installed from ~/.shelf/widgets/<id>/index.js)
