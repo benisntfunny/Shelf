@@ -138,6 +138,45 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
     return { ok: true }
   })
 
+  ipcMain.handle('list-shortcuts', async () => {
+    try {
+      const { execSync } = require('child_process')
+      const output = execSync('shortcuts list', { encoding: 'utf-8', timeout: 5000 })
+      return output.trim().split('\n').filter(Boolean)
+    } catch {
+      return []
+    }
+  })
+
+  ipcMain.handle('run-shortcut', async (_event, name) => {
+    try {
+      const { exec } = require('child_process')
+      return new Promise((resolve) => {
+        exec(`shortcuts run "${name.replace(/"/g, '\\"')}"`, { timeout: 30000 }, (err, stdout) => {
+          resolve({ ok: !err, output: stdout || '' })
+        })
+      })
+    } catch {
+      return { ok: false, output: '' }
+    }
+  })
+
+  ipcMain.handle('launch-action', async (_event, { type, value }) => {
+    try {
+      const { exec } = require('child_process')
+      let cmd
+      if (type === 'app') cmd = `open "${value.replace(/"/g, '\\"')}"`
+      else if (type === 'url') cmd = `open "${value.replace(/"/g, '\\"')}"`
+      else if (type === 'shell') cmd = value
+      else return { ok: false }
+      return new Promise((resolve) => {
+        exec(cmd, { timeout: 10000 }, (err) => resolve({ ok: !err }))
+      })
+    } catch {
+      return { ok: false }
+    }
+  })
+
   ipcMain.handle('fetch-url', async (_event, url) => {
     const https = require('https')
     const http = require('http')

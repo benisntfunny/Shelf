@@ -6,6 +6,7 @@ import calendarWidget from '../calendar/widget'
 import displayWidget from '../display/widget'
 import volumeWidget from '../volume/widget'
 import pageSwitcherWidget from '../page-switcher/widget'
+import shortcutsWidget from '../shortcuts/widget'
 
 const builtinWidgets = [
   clockWidget,
@@ -16,6 +17,7 @@ const builtinWidgets = [
   displayWidget,
   volumeWidget,
   pageSwitcherWidget,
+  shortcutsWidget,
 ]
 
 // Installed widgets (user-installed from ~/.shelf/widgets/<id>/index.js)

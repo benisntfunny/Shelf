@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld('shelf', {
   getCalendarEvents: () => ipcRenderer.invoke('get-calendar-events'),
   getSecrets: () => ipcRenderer.invoke('get-secrets'),
   saveSecrets: (secrets) => ipcRenderer.invoke('save-secrets', secrets),
+  listShortcuts: () => ipcRenderer.invoke('list-shortcuts'),
+  runShortcut: (name) => ipcRenderer.invoke('run-shortcut', name),
+  launchAction: (action) => ipcRenderer.invoke('launch-action', action),
   getPages: () => ipcRenderer.invoke('get-pages'),
   setActivePage: (pageId) => ipcRenderer.invoke('set-active-page', pageId),
   onPageChanged: (callback) => {
