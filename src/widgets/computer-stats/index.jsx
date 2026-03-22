@@ -117,12 +117,27 @@ export default function ComputerStats({ config }) {
     return <div ref={ref} style={{height:'100%',width:'100%'}} />
   }
 
-  // Calculate sizing
-  const count = statList.length
-  const isWide = container.w > container.h
-  const cols = isWide ? Math.min(count, Math.max(1, Math.floor(container.w / 80))) : 1
+  // Calculate grid layout to fill the space
+  const count = statList.filter(s => s !== 'battery' || stats.battery?.present).length
+  if (count === 0) return <div ref={ref} style={{height:'100%',width:'100%'}} />
+
+  // Pick cols/rows to best fill the rectangle
+  let bestCols = 1, bestRows = count
+  let bestRatio = Infinity
+  for (let c = 1; c <= count; c++) {
+    const r = Math.ceil(count / c)
+    const cellW = container.w / c
+    const cellH = container.h / r
+    const ratio = Math.max(cellW / cellH, cellH / cellW)
+    if (ratio < bestRatio) {
+      bestRatio = ratio
+      bestCols = c
+      bestRows = r
+    }
+  }
+  const cols = bestCols
   const cellW = container.w / cols - 8
-  const cellH = container.h / Math.ceil(count / cols) - 8
+  const cellH = container.h / bestRows - 8
   const cellSize = Math.min(cellW, cellH)
 
   function renderStat(statId) {
@@ -171,12 +186,10 @@ export default function ComputerStats({ config }) {
   return (
     <div ref={ref} style={{
       height:'100%',width:'100%',
-      display:'flex',
-      flexWrap:'wrap',
-      alignItems:'center',
-      justifyContent:'space-evenly',
-      alignContent:'center',
-      gap:'6px',
+      display:'grid',
+      gridTemplateColumns: `repeat(${cols}, 1fr)`,
+      gridTemplateRows: `repeat(${bestRows}, 1fr)`,
+      gap:'4px',
       padding:'4px',
       overflow:'hidden',
     }}>
@@ -184,7 +197,7 @@ export default function ComputerStats({ config }) {
         const el = renderStat(statId)
         if (!el) return null
         return (
-          <div key={statId} style={{position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <div key={statId} style={{position:'relative',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
             {showSparklines && stats.history?.[statId] && (
               <Sparkline data={stats.history[statId]} width={cellW} height={cellH * 0.5} />
             )}
