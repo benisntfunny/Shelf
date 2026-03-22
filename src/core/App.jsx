@@ -33,7 +33,7 @@ export default function App() {
     if (idx > 0) switchPage(pages[idx - 1].id)
   }, [pages, activePage, switchPage])
 
-  const { onTouchStart, onTouchEnd } = useSwipe({
+  const { onTouchStart, onTouchMove, onTouchEnd } = useSwipe({
     onSwipeLeft: goNext,
     onSwipeRight: goPrev,
   })
@@ -44,10 +44,14 @@ export default function App() {
                    transitioning === 'enter' ? 'page-enter' : ''
 
   return (
-    <div className="app" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <div className="app" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
       <WidgetBar widgets={layout.widgets} className={barClass} />
       {pages.length > 1 && (
-        <div className="page-indicator">
+        <div className="page-indicator" style={{
+          '--dot-size': (layout.indicatorSize || 6) + 'px',
+          '--dot-color': layout.indicatorColor || 'rgba(255,255,255,0.2)',
+          '--dot-active': layout.indicatorActiveColor || '#c9a84c',
+        }}>
           {pages.map(p => (
             <div
               key={p.id}

@@ -318,6 +318,14 @@ export function useLayout() {
     )
   }, [updatePageWidgets])
 
+  const updateLayoutSetting = useCallback((key, value) => {
+    setLayout(prev => {
+      const next = { ...prev, [key]: value }
+      save(next)
+      return next
+    })
+  }, [save])
+
   const compatLayout = {
     ...layout,
     widgets: activePageData?.widgets || []
@@ -337,6 +345,7 @@ export function useLayout() {
     removeWidget,
     updateWidgetConfig,
     updateWidgetSize,
+    updateLayoutSetting,
     moveWidget,
     undo,
   }

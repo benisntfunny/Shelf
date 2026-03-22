@@ -20,26 +20,27 @@ function thresholdColor(percent) {
 }
 
 function RadialGauge({ percent, label, w, h }) {
-  const size = Math.min(w, h * 0.85)
-  const r = size * 0.38
-  const stroke = Math.max(4, size * 0.1)
+  // Use a fixed viewBox, let SVG scale to container
+  const vb = 100
+  const r = 38
+  const stroke = 10
   const circumference = 2 * Math.PI * r
   const dashOffset = circumference * (1 - Math.min(100, percent) / 100)
   const color = thresholdColor(percent)
-  const cx = size / 2, cy = size / 2
-  const fontSize = Math.max(10, size * 0.24)
-  const labelSize = Math.max(8, size * 0.15)
+  const cx = vb / 2, cy = vb / 2
+  const svgSize = Math.min(w * 0.9, h * 0.75)
+  const labelSize = Math.max(8, svgSize * 0.15)
 
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',width:'100%',gap: Math.max(1, h * 0.02) + 'px'}}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <svg width={svgSize} height={svgSize} viewBox={`0 0 ${vb} ${vb}`}>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke} />
         <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={stroke}
           strokeDasharray={circumference} strokeDashoffset={dashOffset}
           strokeLinecap="round" transform={`rotate(-90 ${cx} ${cy})`}
           style={{transition: 'stroke-dashoffset 0.5s ease'}} />
         <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-          fill="#e0e0e0" fontSize={fontSize} fontWeight="700">{Math.round(percent)}%</text>
+          fill="#e0e0e0" fontSize="22" fontWeight="700">{Math.round(percent)}%</text>
       </svg>
       <span style={{fontSize: labelSize + 'px', color:'#6a6a6a', textTransform:'uppercase', letterSpacing:'0.5px', lineHeight:1}}>{label}</span>
     </div>

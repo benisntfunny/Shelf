@@ -10,7 +10,7 @@ function getRequiredKeys() {
       key: field.key,
       label: field.label,
       placeholder: field.placeholder || '',
-      isSecret: field.secret !== false,
+      isSecret: field.secret === true,
       widgetName: field.widgetName,
       source: 'secretsSchema',
     })

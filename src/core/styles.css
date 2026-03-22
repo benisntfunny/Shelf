@@ -538,16 +538,16 @@ body {
 }
 
 .page-dot {
-  width: 6px;
-  height: 6px;
+  width: var(--dot-size, 6px);
+  height: var(--dot-size, 6px);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--dot-color, rgba(255, 255, 255, 0.2));
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .page-dot.active {
-  background: var(--accent);
+  background: var(--dot-active, var(--accent));
   transform: scale(1.3);
 }
 

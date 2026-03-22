@@ -72,6 +72,20 @@
 .page-tab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
 .page-tab.add { background: none; border-style: dashed; font-size: 14px; padding: 6px 12px; }
 .page-tab.add:hover { border-color: var(--accent); color: var(--accent); }
+.indicator-settings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+}
+.indicator-settings label { color: var(--muted); }
+.indicator-settings input[type="range"] {
+  width: 80px;
+  accent-color: var(--accent);
+}
+.indicator-label { color: var(--muted); font-weight: 600; }
+
 .page-tab-input {
   padding: 5px 10px;
   background: rgba(0, 0, 0, 0.3);

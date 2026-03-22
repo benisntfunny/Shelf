@@ -198,7 +198,7 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
 export default function SettingsApp() {
   const { layout, loaded, pages, activePage, setActivePage,
     addPage, removePage, renamePage,
-    addWidget, removeWidget, updateWidgetConfig, updateWidgetSize, moveWidget, undo } = useLayout()
+    addWidget, removeWidget, updateWidgetConfig, updateWidgetSize, moveWidget, updateLayoutSetting, undo } = useLayout()
   const { selectedWidgetId, selectWidget } = useEditMode()
   const { secrets, loaded: secretsLoaded, updateSecret } = useSecrets()
   const [activeTab, setActiveTab] = useState('layout')
@@ -308,6 +308,18 @@ export default function SettingsApp() {
                     }
                     removePage(activePage)
                   }}>Delete Page</button>
+                </div>
+              )}
+              {pages.length > 1 && (
+                <div className="indicator-settings">
+                  <span className="indicator-label">Indicator:</span>
+                  <label>Size</label>
+                  <input type="range" min="4" max="14" value={layout.indicatorSize || 6}
+                    onChange={(e) => updateLayoutSetting('indicatorSize', Number(e.target.value))} />
+                  <label>Color</label>
+                  <input type="color" value={layout.indicatorActiveColor || '#c9a84c'}
+                    onChange={(e) => updateLayoutSetting('indicatorActiveColor', e.target.value)}
+                    style={{width:24,height:24,border:'1px solid rgba(255,255,255,0.1)',borderRadius:4,background:'transparent',cursor:'pointer',padding:0}} />
                 </div>
               )}
             </section>
