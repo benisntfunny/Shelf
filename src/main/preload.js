@@ -23,6 +23,13 @@ contextBridge.exposeInMainWorld('shelf', {
   getCalendarEvents: () => ipcRenderer.invoke('get-calendar-events'),
   getSecrets: () => ipcRenderer.invoke('get-secrets'),
   saveSecrets: (secrets) => ipcRenderer.invoke('save-secrets', secrets),
+  getPages: () => ipcRenderer.invoke('get-pages'),
+  setActivePage: (pageId) => ipcRenderer.invoke('set-active-page', pageId),
+  onPageChanged: (callback) => {
+    const handler = (_event, data) => callback(data)
+    ipcRenderer.on('page-changed', handler)
+    return () => ipcRenderer.removeListener('page-changed', handler)
+  },
   getWindowMode: () => {
     const params = new URLSearchParams(window.location.search)
     return params.get('mode') || 'bar'

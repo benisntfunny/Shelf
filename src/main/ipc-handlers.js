@@ -125,6 +125,19 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
     return result
   })
 
+  ipcMain.handle('get-pages', () => {
+    const config = loadConfig()
+    return { pages: config.pages || [], activePage: config.activePage }
+  })
+
+  ipcMain.handle('set-active-page', (_event, pageId) => {
+    const config = loadConfig()
+    config.activePage = pageId
+    saveConfig(config)
+    if (notifyBarOfLayoutChange) notifyBarOfLayoutChange()
+    return { ok: true }
+  })
+
   ipcMain.handle('fetch-url', async (_event, url) => {
     const https = require('https')
     const http = require('http')
