@@ -28,21 +28,46 @@ function migrateWidgetSizes(widgets) {
 function migrateConfig(config) {
   if (!config) return null
   if (config._version >= CURRENT_VERSION) return config
-  let result = config
-  if (result.widgets) {
-    result = { ...result, widgets: migrateWidgetSizes(result.widgets) }
+
+  let result = { ...config }
+
+  // Size migration within widgets (flat or paged)
+  if (result.pages) {
+    result.pages = result.pages.map(page => ({
+      ...page,
+      widgets: migrateWidgetSizes(page.widgets || [])
+    }))
+  } else if (result.widgets) {
+    // Flat → paged migration (preserves other top-level config fields)
+    const { widgets, ...rest } = result
+    result = {
+      ...rest,
+      pages: [
+        { id: 'page-1', name: 'Dashboard', triggerApp: null, widgets: migrateWidgetSizes(widgets) }
+      ],
+      activePage: 'page-1'
+    }
   }
+
   result._version = CURRENT_VERSION
   return result
 }
 
 const DEFAULT_CONFIG = {
-  _version: 2,
-  widgets: [
-    { id: 'clock-1', widgetId: 'clock', size: '2x6', config: {} },
-    { id: 'spacer-1', widgetId: 'spacer', size: '2x6', config: {} },
-    { id: 'system-1', widgetId: 'system', size: '3x6', config: {} },
+  _version: CURRENT_VERSION,
+  pages: [
+    {
+      id: 'page-1',
+      name: 'Dashboard',
+      triggerApp: null,
+      widgets: [
+        { id: 'clock-1', widgetId: 'clock', size: '2x6', col: 1, row: 1, config: {} },
+        { id: 'spacer-1', widgetId: 'spacer', size: '2x6', col: 3, row: 1, config: {} },
+        { id: 'system-1', widgetId: 'system', size: '3x6', col: 5, row: 1, config: {} },
+      ]
+    }
   ],
+  activePage: 'page-1'
 }
 
 function ensureDir() {
