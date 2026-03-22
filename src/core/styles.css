@@ -1,5 +1,30 @@
 /* Shelf – Carbon Dark Theme – Clean Rewrite */
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes fadeSlideIn {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 :root {
   --bg: #0f0f0f;
   --card-bg: linear-gradient(180deg, #1d1d1d 0%, #141414 100%);
@@ -40,11 +65,11 @@ body {
   position: relative;
 }
 
-/* ── Widget Bar: 12-column grid ── */
+/* ── Widget Bar: 12x3 grid ── */
 .widget-bar {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  align-items: stretch;
+  grid-template-rows: repeat(3, 1fr);
   height: 100%;
   padding: 6px 8px;
   gap: 6px;
@@ -68,13 +93,6 @@ body {
   transition: border-color 0.2s ease;
 }
 
-/* Grid column spans */
-.widget-card.size-xs  { grid-column: span 1; }
-.widget-card.size-sm  { grid-column: span 2; }
-.widget-card.size-md  { grid-column: span 3; }
-.widget-card.size-lg  { grid-column: span 4; }
-.widget-card.size-xl  { grid-column: span 6; }
-.widget-card.size-full { grid-column: span 12; }
 
 /* Edit mode */
 .widget-card.edit-mode { border-color: var(--accent); cursor: grab; }

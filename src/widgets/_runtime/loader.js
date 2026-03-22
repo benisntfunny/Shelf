@@ -7,6 +7,7 @@ import nowPlayingWidget from '../now-playing/widget'
 import felixStatusWidget from '../felix-status/widget'
 import calendarWidget from '../calendar/widget'
 import displayWidget from '../display/widget'
+import volumeWidget from '../volume/widget'
 
 const builtinWidgets = [
   clockWidget,
@@ -18,6 +19,7 @@ const builtinWidgets = [
   felixStatusWidget,
   calendarWidget,
   displayWidget,
+  volumeWidget,
 ]
 
 // Installed widgets (user-installed from ~/.shelf/widgets/<id>/index.js)

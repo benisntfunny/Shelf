@@ -1,8 +1,7 @@
 export default {
-  defaults: { latitude: '37.7749', longitude: '-122.4194', units: 'F' },
+  defaults: { cities: ['San Francisco', 'New York', 'London'], units: 'F' },
   schema: [
-    { key: 'latitude', label: 'Latitude', type: 'text' },
-    { key: 'longitude', label: 'Longitude', type: 'text' },
+    { key: 'cities', label: 'Cities', type: 'list' },
     { key: 'units', label: 'Units', type: 'select', options: ['C', 'F'] },
   ],
 }

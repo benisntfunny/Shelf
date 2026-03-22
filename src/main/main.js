@@ -1,7 +1,19 @@
-const { app, BrowserWindow, Menu, Tray, screen, nativeImage, Notification, globalShortcut } = require('electron')
+const { app, BrowserWindow, Menu, Tray, screen, nativeImage, Notification, globalShortcut, systemPreferences } = require('electron')
 const path = require('path')
-const { execSync, spawn } = require('child_process')
+const { execSync } = require('child_process')
 const { registerIpcHandlers } = require('./ipc-handlers')
+
+// Load touch remap native addon
+const touchRemapPath = app.isPackaged
+  ? path.join(process.resourcesPath, 'native', 'touch_remap.node')
+  : path.join(__dirname, '../../native/build/Release/touch_remap.node')
+let touchRemap
+try {
+  touchRemap = require(touchRemapPath)
+} catch (err) {
+  console.log('[Shelf] Touch remap addon not found:', err.message)
+  touchRemap = null
+}
 
 // Enable touch support
 app.commandLine.appendSwitch('touch-events', 'enabled')
@@ -12,7 +24,6 @@ Menu.setApplicationMenu(null)
 let barWindow = null
 let settingsWindow = null
 let tray = null
-let touchRemapProcess = null
 
 function findTargetDisplay() {
   const displays = screen.getAllDisplays()
@@ -74,6 +85,8 @@ function createBarWindow(attempt = 0) {
       maximizable: false,
       alwaysOnTop: true,
       skipTaskbar: true,
+      enableLargerThanScreen: true,
+      roundedCorners: false,
       backgroundColor: '#0f0f0f',
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
@@ -82,7 +95,8 @@ function createBarWindow(attempt = 0) {
       },
     })
 
-    barWindow.setSimpleFullScreen(true)
+    // Set window level above menu bar without using simpleFullScreen (which causes dock issues)
+    barWindow.setAlwaysOnTop(true, 'screen-saver')
 
     const isDev = !!process.env.SHELF_DEV
     if (isDev) {
@@ -176,8 +190,12 @@ function notifyBarOfLayoutChange() {
   }
 }
 
+let displayChangeTimer = null
+
 function handleDisplayChange() {
-  setTimeout(() => {
+  if (displayChangeTimer) clearTimeout(displayChangeTimer)
+  displayChangeTimer = setTimeout(() => {
+    displayChangeTimer = null
     const target = findTargetDisplay()
     if (!target || target.size.height > 720) return
 
@@ -188,57 +206,39 @@ function handleDisplayChange() {
 
     const { x, y, width, height } = target.bounds
     barWindow.setBounds({ x, y, width, height })
-  }, 2000)
+
+    // Restart touch remap with new display bounds
+    startTouchRemap()
+  }, 500)
 }
 
 function startTouchRemap() {
-  if (touchRemapProcess) {
-    touchRemapProcess.kill()
-    touchRemapProcess = null
-  }
-
-  // In dev: native/touch-remap relative to project root
-  // In packaged app: Resources/native/touch-remap
-  const binaryPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'native', 'touch-remap')
-    : path.join(__dirname, '../../native/touch-remap')
-  const fs = require('fs')
-  if (!fs.existsSync(binaryPath)) {
-    console.log('[Shelf] Touch remapper binary not found at', binaryPath)
-    return
-  }
+  if (!touchRemap) return
+  if (touchRemap.isRunning()) touchRemap.stop()
 
   const target = findTargetDisplay()
   if (!target) return
 
+  const primary = screen.getPrimaryDisplay()
   const { x, y, width, height } = target.bounds
-  console.log(`[Shelf] Starting touch remapper for display at (${x}, ${y}) ${width}x${height}`)
 
-  touchRemapProcess = spawn(binaryPath, [String(x), String(y), String(width), String(height)], {
-    stdio: ['ignore', 'pipe', 'pipe'],
-  })
-
-  touchRemapProcess.stdout.on('data', (data) => {
-    const msg = data.toString().trim()
-    if (msg === 'READY') {
-      console.log('[Shelf] Touch remapper is active')
-    }
-  })
-
-  touchRemapProcess.stderr.on('data', (data) => {
-    console.log('[Shelf] touch-remap:', data.toString().trim())
-  })
-
-  touchRemapProcess.on('exit', (code) => {
-    console.log(`[Shelf] Touch remapper exited with code ${code}`)
-    touchRemapProcess = null
-  })
+  try {
+    touchRemap.start(primary.size.width, primary.size.height, x, y, width, height)
+    console.log('[Shelf] Touch remapper is active')
+  } catch (err) {
+    console.log('[Shelf] Touch remapper failed:', err.message)
+  }
 }
 
 app.whenReady().then(() => {
   registerIpcHandlers(notifyBarOfLayoutChange)
   createTray()
   createBarWindow()
+
+  const trusted = systemPreferences.isTrustedAccessibilityClient(true)
+  if (!trusted) {
+    console.log('[Shelf] Accessibility permission not yet granted — touch remap will fail until granted')
+  }
   startTouchRemap()
 
   screen.on('display-metrics-changed', handleDisplayChange)
@@ -251,9 +251,8 @@ app.whenReady().then(() => {
 })
 
 app.on('will-quit', () => {
-  if (touchRemapProcess) {
-    touchRemapProcess.kill()
-    touchRemapProcess = null
+  if (touchRemap && touchRemap.isRunning()) {
+    touchRemap.stop()
   }
 })
 

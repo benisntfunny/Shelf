@@ -1,4 +1,4 @@
-const { exec } = require('child_process')
+const { exec, execFile } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
@@ -64,14 +64,45 @@ async function getNowPlaying() {
       return { playing: false, track: '', artist: '', album: '', artwork: null, position: 0, duration: 0 }
     }
 
-    const [track, artist, album, position, duration, artwork] = await Promise.all([
+    const [track, artist, album, position, duration, artwork, queueInfo] = await Promise.all([
       runOsascript('tell application "Music" to name of current track'),
       runOsascript('tell application "Music" to artist of current track'),
       runOsascript('tell application "Music" to album of current track'),
       runOsascript('tell application "Music" to player position'),
       runOsascript('tell application "Music" to duration of current track'),
       getAlbumArt(),
+      // Try to get prev/next track from the current playlist context
+      runOsascript(`tell application "Music"
+        try
+          set idx to index of current track
+          set pl to current playlist
+          set totalTracks to count of tracks of pl
+          set prevName to ""
+          set prevArtist to ""
+          set nextName to ""
+          set nextArtist to ""
+          if idx > 1 then
+            set prevName to name of track (idx - 1) of pl
+            set prevArtist to artist of track (idx - 1) of pl
+          end if
+          if idx < totalTracks then
+            set nextName to name of track (idx + 1) of pl
+            set nextArtist to artist of track (idx + 1) of pl
+          end if
+          return prevName & "|||" & prevArtist & "|||" & nextName & "|||" & nextArtist
+        on error
+          return "|||||||"
+        end try
+      end tell`).catch(() => '|||||||'),
     ])
+
+    let prevTrack = null
+    let nextTrack = null
+    if (queueInfo) {
+      const parts = queueInfo.split('|||')
+      if (parts[0]) prevTrack = { name: parts[0], artist: parts[1] || '' }
+      if (parts[2]) nextTrack = { name: parts[2], artist: parts[3] || '' }
+    }
 
     return {
       playing: state === 'playing',
@@ -81,6 +112,8 @@ async function getNowPlaying() {
       artwork,
       position: parseFloat(position) || 0,
       duration: parseFloat(duration) || 0,
+      prevTrack,
+      nextTrack,
     }
   } catch (e) {
     console.error('[apple-music] getNowPlaying failed:', e.message)
@@ -166,15 +199,19 @@ async function getPlaylistTracks(playlistName) {
 
 async function playTrack(name, artist) {
   try {
-    const escapedName = name.replace(/"/g, '\\"')
-    const escapedArtist = artist.replace(/"/g, '\\"')
-    const script = `tell application "Music"
-set results to (every track whose name is "${escapedName}" and artist is "${escapedArtist}")
-if results is not {} then play item 1 of results
-end tell`.replace(/\n/g, '\\n')
+    const escapedName = name.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    const escapedArtist = artist.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    const lines = [
+      'tell application "Music"',
+      `set results to (every track whose name is "${escapedName}" and artist is "${escapedArtist}")`,
+      'if results is not {} then play item 1 of results',
+      'end tell',
+    ]
+    const args = []
+    lines.forEach((line) => { args.push('-e', line) })
 
     await new Promise((resolve) => {
-      exec(`osascript -e '${script}'`, { timeout: 5000 }, (err) => {
+      execFile('/usr/bin/osascript', args, { timeout: 10000 }, (err) => {
         if (err) console.error('[apple-music] playTrack failed:', err.message)
         resolve()
       })

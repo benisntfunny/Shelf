@@ -1,1 +1,1 @@
-export default { id: 'stocks', name: 'Stocks', description: 'Stock ticker prices', icon: '\u{1F4C8}', defaultSize: 'lg', sizes: ['md', 'lg', 'xl'] }
+export default { id: 'stocks', name: 'Stocks', description: 'Stock ticker prices', icon: '\u{1F4C8}', defaultSize: '4x1', sizes: ['1x1', '2x1', '3x1', '4x1', '6x1', '12x1', '4x2', '4x3', '6x2', '6x3'] }

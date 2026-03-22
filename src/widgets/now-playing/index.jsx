@@ -7,6 +7,41 @@ function formatTime(secs) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+function MarqueeText({ text, style }) {
+  const containerRef = useRef(null)
+  const textRef = useRef(null)
+  const [shouldScroll, setShouldScroll] = useState(false)
+
+  useEffect(() => {
+    const check = () => {
+      if (containerRef.current && textRef.current) {
+        setShouldScroll(textRef.current.scrollWidth > containerRef.current.offsetWidth)
+      }
+    }
+    check()
+    const timer = setTimeout(check, 100)
+    return () => clearTimeout(timer)
+  }, [text])
+
+  return (
+    <div ref={containerRef} style={{ overflow: 'hidden', whiteSpace: 'nowrap', ...style }}>
+      <span
+        ref={textRef}
+        style={{
+          display: 'inline-block',
+          ...(shouldScroll ? {
+            animation: 'marquee 8s linear infinite',
+            paddingRight: '4vw',
+          } : {}),
+        }}
+      >
+        {text}
+        {shouldScroll && <span style={{ paddingLeft: '4vw' }}>{text}</span>}
+      </span>
+    </div>
+  )
+}
+
 function AlbumThumb({ album, artist }) {
   const [art, setArt] = useState(null)
   useEffect(() => {
@@ -257,25 +292,50 @@ export default function NowPlaying() {
   }
 
   return (
-    <div style={{display:'flex',flexDirection:'row',alignItems:'center',height:'100%',width:'100%',gap:'4vw',padding:'2vh 2vw',position:'relative'}}>
-      {/* Album art - left side */}
-      <div style={{width:'75vh',maxWidth:'40%',aspectRatio:'1',borderRadius:'12px',background:'#1e1e1e',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12vh',overflow:'hidden'}}>
-        {track.artwork ? <img src={track.artwork} style={{width:'100%',height:'100%',objectFit:'cover'}} alt="" /> : '\u{1F3B5}'}
-      </div>
-      {/* Track info - right side */}
-      <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',gap:'1.5vh',minWidth:0}}>
-        <div style={{fontSize:'7vh',fontWeight:600,color:'#e0e0e0',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.1}}>{track.track}</div>
-        <div style={{fontSize:'5vh',color:'#6a6a6a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.1}}>{track.artist}</div>
-        <div style={{display:'flex',gap:'3vw',marginTop:'1vh'}}>
-          <button onClick={() => cmd('previous')} style={{fontSize:'8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23EE'}</button>
-          <button onClick={() => cmd('playpause')} style={{fontSize:'9vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.9,padding:0,lineHeight:1}}>{track.playing ? '\u23F8' : '\u25B6'}</button>
-          <button onClick={() => cmd('next')} style={{fontSize:'8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23ED'}</button>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',width:'100%',position:'relative'}}>
+      {/* Main content — key triggers fade animation on track change */}
+      <div key={track.track + '|' + track.artist} style={{display:'flex',flexDirection:'row',alignItems:'center',flex:1,gap:'3vw',padding:'1.5vh 2vw',minHeight:0,animation:'fadeSlideIn 0.4s ease'}}>
+        {/* Album art */}
+        <div style={{width:'25vh',height:'25vh',maxWidth:'30%',borderRadius:'12px',background:'#1e1e1e',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12vh',overflow:'hidden'}}>
+          {track.artwork ? <img src={track.artwork} style={{width:'100%',height:'100%',objectFit:'cover',animation:'fadeIn 0.3s ease'}} alt="" /> : '\u{1F3B5}'}
+        </div>
+        {/* Track info */}
+        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',gap:'1vh',minWidth:0}}>
+          <MarqueeText text={track.track} style={{fontSize:'7vh',fontWeight:600,color:'#e0e0e0',lineHeight:1.1}} />
+          <div style={{fontSize:'5vh',color:'#6a6a6a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.1}}>{track.artist}</div>
+          <div style={{display:'flex',gap:'3vw',marginTop:'0.5vh'}}>
+            <button onClick={() => cmd('previous')} style={{fontSize:'8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23EE'}</button>
+            <button onClick={() => cmd('playpause')} style={{fontSize:'9vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.9,padding:0,lineHeight:1}}>{track.playing ? '\u23F8' : '\u25B6'}</button>
+            <button onClick={() => cmd('next')} style={{fontSize:'8vh',background:'none',border:'none',color:'#e0e0e0',cursor:'pointer',opacity:0.7,padding:0,lineHeight:1}}>{'\u23ED'}</button>
+          </div>
         </div>
       </div>
-      {/* Browse button top right */}
-      <button onClick={() => setBrowsing(true)} style={{position:'absolute',top:'2vh',right:'1.5vw',padding:'1vh 1.5vw',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'12px',color:'#6a6a6a',fontSize:'3.5vh',cursor:'pointer'}}>Browse</button>
-      {/* Browse overlay */}
-      {browsing && <BrowseOverlay onClose={() => setBrowsing(false)} />}
+      {/* Prev/Next track bar */}
+      {(track.prevTrack || track.nextTrack) && (
+        <div style={{display:'flex',borderTop:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+          <button onClick={() => cmd('previous')} style={{flex:1,padding:'1vh 2vw',cursor:'pointer',overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis',borderRight:'1px solid rgba(255,255,255,0.06)',background:'none',border:'none',borderRight:'1px solid rgba(255,255,255,0.06)',textAlign:'left',touchAction:'manipulation'}}>
+            {track.prevTrack ? (
+              <>
+                <span style={{fontSize:'2.5vh',color:'#6a6a6a',marginRight:'0.5vw'}}>{'\u23EE'}</span>
+                <span style={{fontSize:'2.8vh',color:'#8a8a8a'}}>{track.prevTrack.name}</span>
+                <span style={{fontSize:'2.2vh',color:'#6a6a6a',marginLeft:'0.5vw'}}>{track.prevTrack.artist}</span>
+              </>
+            ) : <span style={{fontSize:'2.5vh',color:'#4a4a4a'}}>&nbsp;</span>}
+          </button>
+          <button onClick={() => cmd('next')} style={{flex:1,padding:'1vh 2vw',cursor:'pointer',overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis',textAlign:'right',background:'none',border:'none',touchAction:'manipulation'}}>
+            {track.nextTrack ? (
+              <>
+                <span style={{fontSize:'2.8vh',color:'#8a8a8a'}}>{track.nextTrack.name}</span>
+                <span style={{fontSize:'2.2vh',color:'#6a6a6a',marginLeft:'0.5vw'}}>{track.nextTrack.artist}</span>
+                <span style={{fontSize:'2.5vh',color:'#6a6a6a',marginLeft:'0.5vw'}}>{'\u23ED'}</span>
+              </>
+            ) : <span style={{fontSize:'2.5vh',color:'#4a4a4a'}}>&nbsp;</span>}
+          </button>
+        </div>
+      )}
+      {/* Browse button */}
+      <button onClick={() => setBrowsing(true)} style={{position:'absolute',top:'1.5vh',right:'1.5vw',padding:'0.8vh 1.5vw',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'12px',color:'#6a6a6a',fontSize:'3.5vh',cursor:'pointer'}}>Browse</button>
+      {browsing && <div style={{position:'absolute',inset:0,animation:'slideUp 0.3s ease'}}><BrowseOverlay onClose={() => setBrowsing(false)} /></div>}
     </div>
   )
 }

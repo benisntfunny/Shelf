@@ -20,9 +20,12 @@ export default function ConfigField({ field, value, onChange }) {
       <div className="config-field">
         <label>{field.label}</label>
         <select value={value || ''} onChange={(e) => onChange(e.target.value)}>
-          {(field.options || []).map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
+          {(field.options || []).map((opt) => {
+            const isObj = typeof opt === 'object'
+            const val = isObj ? opt.value : opt
+            const lbl = isObj ? opt.label : opt
+            return <option key={val} value={val}>{lbl}</option>
+          })}
         </select>
       </div>
     )
@@ -43,6 +46,64 @@ export default function ConfigField({ field, value, onChange }) {
 
   if (field.type === 'list') {
     const items = Array.isArray(value) ? value : []
+
+    // Structured list with itemSchema (array of objects)
+    if (field.itemSchema) {
+      return (
+        <div className="config-field list-field">
+          <label>{field.label}</label>
+          <div className="list-items">
+            {items.map((item, i) => (
+              <div key={i} className="list-item-structured">
+                {field.itemSchema.map((sub) => {
+                  if (sub.type === 'select') {
+                    return (
+                      <select
+                        key={sub.key}
+                        value={item?.[sub.key] ?? ''}
+                        onChange={(e) => {
+                          const updated = [...items]
+                          updated[i] = { ...updated[i], [sub.key]: e.target.value }
+                          onChange(updated)
+                        }}
+                      >
+                        {(sub.options || []).map((opt) => {
+                          const isObj = typeof opt === 'object'
+                          const val = isObj ? opt.value : opt
+                          const lbl = isObj ? opt.label : opt
+                          return <option key={val} value={val}>{lbl}</option>
+                        })}
+                      </select>
+                    )
+                  }
+                  return (
+                    <input
+                      key={sub.key}
+                      type="text"
+                      value={item?.[sub.key] ?? ''}
+                      placeholder={sub.placeholder || sub.label}
+                      onChange={(e) => {
+                        const updated = [...items]
+                        updated[i] = { ...updated[i], [sub.key]: e.target.value }
+                        onChange(updated)
+                      }}
+                    />
+                  )
+                })}
+                <button onClick={() => onChange(items.filter((_, j) => j !== i))}>x</button>
+              </div>
+            ))}
+          </div>
+          <button className="add-btn" onClick={() => {
+            const empty = {}
+            field.itemSchema.forEach((sub) => { empty[sub.key] = '' })
+            onChange([...items, empty])
+          }}>+ Add</button>
+        </div>
+      )
+    }
+
+    // Simple string list
     return (
       <div className="config-field list-field">
         <label>{field.label}</label>
@@ -86,6 +147,7 @@ export default function ConfigField({ field, value, onChange }) {
         type="text"
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
+        placeholder={field.placeholder || ''}
       />
     </div>
   )

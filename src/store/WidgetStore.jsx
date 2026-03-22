@@ -84,14 +84,14 @@ export default function WidgetStore({ onAddWidget }) {
                 {w.builtin && installed ? (
                   <button
                     className="store-btn store-btn-add"
-                    onClick={() => onAddWidget(w.id, w.sizes[Math.floor(w.sizes.length / 2)] || 'sm')}
+                    onClick={() => onAddWidget(w.id, w.sizes[Math.floor(w.sizes.length / 2)] || '3x3')}
                   >
                     Add to Bar
                   </button>
                 ) : w.builtin ? (
                   <button
                     className="store-btn store-btn-add"
-                    onClick={() => onAddWidget(w.id, w.sizes[Math.floor(w.sizes.length / 2)] || 'sm')}
+                    onClick={() => onAddWidget(w.id, w.sizes[Math.floor(w.sizes.length / 2)] || '3x3')}
                   >
                     Add to Bar
                   </button>

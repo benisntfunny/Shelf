@@ -15,7 +15,7 @@ export default function ConfigPanel({ widget, onConfigChange, onSizeChange }) {
   const schema = widgetConfig?.schema || []
   const defaults = widgetConfig?.defaults || {}
   const config = { ...defaults, ...widget.config }
-  const validSizes = meta?.sizes || ['sm', 'md', 'lg']
+  const validSizes = meta?.sizes || ['2x3', '3x3', '4x3']
 
   return (
     <div className="config-panel">
@@ -30,7 +30,7 @@ export default function ConfigPanel({ widget, onConfigChange, onSizeChange }) {
               className={widget.size === s ? 'active' : ''}
               onClick={() => onSizeChange(s)}
             >
-              {s.toUpperCase()}
+              {s}
             </button>
           ))}
         </div>

@@ -4,7 +4,7 @@ const { loadConfig, saveConfig, loadSecrets, saveSecrets } = require('./config-s
 const { getSystemStats } = require('./system-stats')
 const { getNowPlaying, musicCommand, getPlaylists, getPlaylistTracks, playTrack, getAlbumArtByName, searchTracks } = require('./apple-music')
 const { getStockQuotes } = require('./stocks-api')
-const { getWeather } = require('./weather-api')
+const { getWeather, getWeatherByCity, geocodeCity } = require('./weather-api')
 const { getCalendarEvents } = require('./calendar')
 
 function registerIpcHandlers(notifyBarOfLayoutChange) {
@@ -56,6 +56,35 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
 
   ipcMain.handle('get-weather', (_event, { lat, lon, units }) => {
     return getWeather(lat, lon, units)
+  })
+
+  ipcMain.handle('get-weather-by-city', (_event, { city, units }) => {
+    return getWeatherByCity(city, units)
+  })
+
+  ipcMain.handle('geocode-city', (_event, name) => {
+    return geocodeCity(name)
+  })
+
+  ipcMain.handle('get-volume', async () => {
+    try {
+      const { execSync } = require('child_process')
+      const volume = parseInt(execSync('osascript -e "output volume of (get volume settings)"').toString().trim(), 10)
+      const muted = execSync('osascript -e "output muted of (get volume settings)"').toString().trim() === 'true'
+      return { volume, muted }
+    } catch {
+      return { volume: 50, muted: false }
+    }
+  })
+
+  ipcMain.handle('set-volume', (_event, { volume, muted }) => {
+    try {
+      const { execSync } = require('child_process')
+      if (volume !== undefined) execSync(`osascript -e "set volume output volume ${Math.round(volume)}"`)
+      if (muted !== undefined) execSync(`osascript -e "set volume output muted ${muted}"`)
+    } catch (e) {
+      console.error('[Shelf] set-volume failed:', e.message)
+    }
   })
 
   ipcMain.handle('get-calendar-events', () => {

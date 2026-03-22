@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <WidgetBar widgets={layout.widgets} editMode={false} />
+      <WidgetBar widgets={layout.widgets} />
     </div>
   )
 }
