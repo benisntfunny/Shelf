@@ -1,20 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
+import { GRID_COLS, GRID_ROWS } from '../constants'
 
 const DEFAULT_LAYOUT = {
   widgets: [
-    { id: 'clock-1', widgetId: 'clock', size: '2x3', col: 1, row: 1, config: {} },
-    { id: 'spacer-1', widgetId: 'spacer', size: '2x3', col: 3, row: 1, config: {} },
-    { id: 'system-1', widgetId: 'system', size: '3x3', col: 5, row: 1, config: {} },
+    { id: 'clock-1', widgetId: 'clock', size: '2x6', col: 1, row: 1, config: {} },
+    { id: 'spacer-1', widgetId: 'spacer', size: '2x6', col: 3, row: 1, config: {} },
+    { id: 'system-1', widgetId: 'system', size: '3x6', col: 5, row: 1, config: {} },
   ],
 }
 
-const SIZE_MIGRATION = {
-  xs: '1x3', sm: '2x3', md: '3x3', lg: '4x3', xl: '6x3', full: '12x3', fill: '2x3'
-}
-
 function parseSize(size) {
-  const [w, h] = (size || '4x3').split('x').map(Number)
-  return { w: w || 4, h: h || 3 }
+  const [w, h] = (size || `4x${GRID_ROWS}`).split('x').map(Number)
+  return { w: w || 4, h: h || GRID_ROWS }
 }
 
 // Check if a widget at (col, row) with size (w, h) overlaps any existing widget
@@ -33,8 +30,8 @@ function overlaps(col, row, w, h, widgets, excludeId) {
 
 // Find first available position for a widget of given size
 function findOpenPosition(w, h, widgets) {
-  for (let r = 1; r <= 3 - h + 1; r++) {
-    for (let c = 1; c <= 12 - w + 1; c++) {
+  for (let r = 1; r <= GRID_ROWS - h + 1; r++) {
+    for (let c = 1; c <= GRID_COLS - w + 1; c++) {
       if (!overlaps(c, r, w, h, widgets, null)) {
         return { col: c, row: r }
       }
@@ -58,17 +55,6 @@ function assignPositions(widgets) {
   return result
 }
 
-function migrateLayout(config) {
-  if (!config?.widgets) return config
-  let widgets = config.widgets.map((w) => {
-    const migrated = SIZE_MIGRATION[w.size]
-    if (migrated) return { ...w, size: migrated }
-    return w
-  })
-  widgets = assignPositions(widgets)
-  return { ...config, widgets }
-}
-
 export function useLayout() {
   const [layout, setLayout] = useState(DEFAULT_LAYOUT)
   const [loaded, setLoaded] = useState(false)
@@ -77,7 +63,7 @@ export function useLayout() {
     if (window.shelf) {
       const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 3000))
       return Promise.race([window.shelf.getLayout(), timeout]).then((config) => {
-        setLayout(migrateLayout(config) || DEFAULT_LAYOUT)
+        setLayout(config || DEFAULT_LAYOUT)
         setLoaded(true)
       }).catch(() => {
         console.error('useLayout: getLayout failed, using defaults')
@@ -142,8 +128,8 @@ export function useLayout() {
       const widget = prev.widgets.find((ww) => ww.id === id)
       // Try to keep same position, but if it overflows the grid, adjust
       let col = widget?.col || 1, row = widget?.row || 1
-      if (col + w - 1 > 12) col = Math.max(1, 12 - w + 1)
-      if (row + h - 1 > 3) row = Math.max(1, 3 - h + 1)
+      if (col + w - 1 > GRID_COLS) col = Math.max(1, GRID_COLS - w + 1)
+      if (row + h - 1 > GRID_ROWS) row = Math.max(1, GRID_ROWS - h + 1)
       const next = {
         ...prev,
         widgets: prev.widgets.map((ww) => (ww.id === id ? { ...ww, size, col, row } : ww)),
