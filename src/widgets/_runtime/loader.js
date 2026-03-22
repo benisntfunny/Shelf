@@ -1,10 +1,7 @@
 import clockWidget from '../clock/widget'
-import spacerWidget from '../spacer/widget'
-import systemWidget from '../system/widget'
 import weatherWidget from '../weather/widget'
 import stocksWidget from '../stocks/widget'
 import nowPlayingWidget from '../now-playing/widget'
-import felixStatusWidget from '../felix-status/widget'
 import calendarWidget from '../calendar/widget'
 import displayWidget from '../display/widget'
 import volumeWidget from '../volume/widget'
@@ -12,12 +9,9 @@ import pageSwitcherWidget from '../page-switcher/widget'
 
 const builtinWidgets = [
   clockWidget,
-  spacerWidget,
-  systemWidget,
   weatherWidget,
   stocksWidget,
   nowPlayingWidget,
-  felixStatusWidget,
   calendarWidget,
   displayWidget,
   volumeWidget,

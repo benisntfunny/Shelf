@@ -62,8 +62,6 @@ const DEFAULT_CONFIG = {
       triggerApp: null,
       widgets: [
         { id: 'clock-1', widgetId: 'clock', size: '2x6', col: 1, row: 1, config: {} },
-        { id: 'spacer-1', widgetId: 'spacer', size: '2x6', col: 3, row: 1, config: {} },
-        { id: 'system-1', widgetId: 'system', size: '3x6', col: 5, row: 1, config: {} },
       ]
     }
   ],

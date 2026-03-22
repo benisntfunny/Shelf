@@ -1,7 +1,0 @@
-{
-  "name": "@shelf-widgets/felix-status",
-  "version": "1.0.0",
-  "description": "URL health monitor",
-  "main": "index.jsx",
-  "peerDependencies": { "react": ">=18" }
-}
