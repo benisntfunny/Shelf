@@ -182,6 +182,34 @@ function registerIpcHandlers(notifyBarOfLayoutChange) {
     }
   })
 
+  ipcMain.handle('ha-get-states', async (_event, entityIds) => {
+    try {
+      const { getStates } = require('./ha-client')
+      return { ok: true, states: await getStates(entityIds) }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('ha-call-service', async (_event, { domain, service, data }) => {
+    try {
+      const { callService } = require('./ha-client')
+      await callService(domain, service, data)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
+  ipcMain.handle('ha-get-entities', async () => {
+    try {
+      const { getAllEntities } = require('./ha-client')
+      return { ok: true, entities: await getAllEntities() }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  })
+
   ipcMain.handle('fetch-url', async (_event, url) => {
     const https = require('https')
     const http = require('http')

@@ -8,6 +8,7 @@ import volumeWidget from '../volume/widget'
 import pageSwitcherWidget from '../page-switcher/widget'
 import shortcutsWidget from '../shortcuts/widget'
 import computerStatsWidget from '../computer-stats/widget'
+import homeAssistantWidget from '../home-assistant/widget'
 
 const builtinWidgets = [
   clockWidget,
@@ -20,6 +21,7 @@ const builtinWidgets = [
   pageSwitcherWidget,
   shortcutsWidget,
   computerStatsWidget,
+  homeAssistantWidget,
 ]
 
 // Installed widgets (user-installed from ~/.shelf/widgets/<id>/index.js)
