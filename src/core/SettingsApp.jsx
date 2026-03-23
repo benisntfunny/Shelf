@@ -176,7 +176,7 @@ function BarPreview({ widgets, selectedWidgetId, onSelect, onRemove, onSizeChang
             onClick={() => onSelect(widget.id)}
             onMouseDown={(e) => handleDragStart(e, widget)}
           >
-            <span className="preview-icon">{meta?.icon || '?'}</span>
+            <span className="preview-icon">{meta?.icon && typeof meta.icon === 'string' && (meta.icon.endsWith('.png') || meta.icon.startsWith('data:')) ? <img src={meta.icon} alt={meta?.name} style={{width:'24px',height:'24px',objectFit:'contain'}} /> : (meta?.icon || '?')}</span>
             <span className="preview-label">{meta?.name || widget.widgetId}</span>
             <span className="preview-size">{widget.size}</span>
             <button className="preview-remove" onClick={(e) => { e.stopPropagation(); onRemove(widget.id) }}>x</button>
