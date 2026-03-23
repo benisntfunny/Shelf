@@ -18,13 +18,15 @@
     "mac": {
       "category": "public.app-category.utilities",
       "target": "dir",
-      "identity": null
+      "identity": null,
+      "icon": "assets/icon.icns"
     },
     "files": [
       "dist/**/*",
       "src/main/**/*",
       "node_modules/**/*",
-      "!node_modules/.cache"
+      "!node_modules/.cache",
+      "assets/**/*"
     ],
     "extraResources": [
       {

@@ -244,6 +244,12 @@ function startTouchRemap() {
 }
 
 app.whenReady().then(() => {
+  // Set dock icon
+  const dockIconPath = path.join(__dirname, '../../assets/icon.png')
+  if (app.dock) {
+    const dockIcon = nativeImage.createFromPath(dockIconPath)
+    if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon)
+  }
   registerIpcHandlers(notifyBarOfLayoutChange)
   createTray()
   createBarWindow()
